@@ -2,11 +2,11 @@ import type { Metadata } from 'next'
 import { RouteProtection } from '@/components/auth/route-protection'
 
 export const metadata: Metadata = {
-  title: 'My Habits - Atomic Habits Agent',
-  description: 'Track and manage your habits',
+  title: 'Profile - Atomic Habits Agent',
+  description: 'View your habit statistics and progress',
 }
 
-export default function HabitsLayout({
+export default function ProfileLayout({
   children,
 }: {
   children: React.ReactNode

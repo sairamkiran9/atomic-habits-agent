@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter as InterFont } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '../components/providers/theme-provider'
+import { NavBar } from '@/components/layout/nav-bar'
 
 const inter = InterFont({
   subsets: ['latin'],
@@ -30,6 +31,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <NavBar />
           <main className="flex-1">
             {children}
           </main>
