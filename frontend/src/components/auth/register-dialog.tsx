@@ -37,12 +37,9 @@ export function RegisterDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button 
-          variant="default" 
-          className="px-8 py-3 rounded-lg font-semibold"
-        >
+        <button className="btn-lg btn-primary">
           Get Started
-        </Button>
+        </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -132,7 +129,7 @@ export function RegisterDialog() {
             )}
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full btn-lg">
             Register
           </Button>
         </form>
