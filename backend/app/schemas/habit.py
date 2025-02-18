@@ -21,10 +21,10 @@ class HabitCategory(str, Enum):
 class HabitBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=100)
     description: str = Field(..., min_length=1, max_length=500)
-    # frequency: HabitFrequency
-    # category: HabitCategory
-    # time_of_day: Optional[str] = None
-    # reminder_time: Optional[str] = None
+    frequency: HabitFrequency
+    category: HabitCategory
+    time_of_day: Optional[str] = None
+    reminder_time: Optional[str] = None
 
 class HabitCreate(HabitBase):
     pass
@@ -32,21 +32,21 @@ class HabitCreate(HabitBase):
 class HabitUpdate(HabitBase):
     title: Optional[str] = Field(None, min_length=1, max_length=100)
     description: Optional[str] = Field(None, min_length=1, max_length=500)
-    # frequency: Optional[HabitFrequency] = None
-    # category: Optional[HabitCategory] = None
-    # time_of_day: Optional[str] = None
-    # reminder_time: Optional[str] = None
-    # completed: Optional[bool] = None
-    # is_archived: Optional[bool] = None
+    frequency: Optional[HabitFrequency] = None
+    category: Optional[HabitCategory] = None
+    time_of_day: Optional[str] = None
+    reminder_time: Optional[str] = None
+    completed: Optional[bool] = None
+    is_archived: Optional[bool] = None
 
 class HabitInDB(HabitBase):
     id: int
     user_id: int
-    # created_at: datetime
-    # updated_at: Optional[datetime] = None
-    # streak: int = 0
-    # completed: bool = False
-    # is_archived: bool = False
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+    streak: int = 0
+    completed: bool = False
+    is_archived: bool = False
 
     class Config:
         from_attributes = True

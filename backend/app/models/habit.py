@@ -17,15 +17,15 @@ class Habit(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String(100), nullable=False)
     description = Column(String(500), nullable=False)
-    # frequency = Column(String, nullable=False)  # daily, weekly, monthly
-    # time_of_day = Column(String)
-    # created_at = Column(DateTime(timezone=True), server_default=func.now())
-    # updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    # streak = Column(Integer, default=0)
-    # completed = Column(Boolean, default=False)
-    # category = Column(String, nullable=False)
-    # reminder_time = Column(String)
-    # is_archived = Column(Boolean, default=False)
+    frequency = Column(String, nullable=False)  # daily, weekly, monthly
+    time_of_day = Column(String)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    streak = Column(Integer, default=0)
+    completed = Column(Boolean, default=False)
+    category = Column(String, nullable=False)
+    reminder_time = Column(String)
+    is_archived = Column(Boolean, default=False)
     
     # Foreign key to user
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
