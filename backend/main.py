@@ -6,7 +6,7 @@ from fastapi.openapi.docs import (
 )
 from fastapi.openapi.utils import get_openapi
 
-from app.api.routes import auth, user
+from app.api.routes import auth, user, habits
 from app.core.config import settings
 
 app = FastAPI(
@@ -45,6 +45,12 @@ app.include_router(
     user.router,
     prefix="/api/user",
     tags=["User"]
+)
+
+app.include_router(
+    habits.router,
+    prefix="/api/habits",
+    tags=["habits"]
 )
 
 def custom_openapi():

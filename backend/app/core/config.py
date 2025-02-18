@@ -15,8 +15,13 @@ class Settings(BaseSettings):
     # Database settings
     DATABASE_URL: str = f"sqlite+aiosqlite:///{PROJECT_ROOT}/atomic_habits.db"
 
+    # Optional: Add this if you want to use PYTHONPATH from .env
+    # PYTHONPATH: str | None = None
+
     class Config:
         env_file = ".env"
+        # Allow extra fields in the environment
+        extra = "ignore"
 
 @lru_cache()
 def get_settings():

@@ -2,7 +2,10 @@ import asyncio
 import os
 from sqlalchemy.ext.asyncio import create_async_engine
 from app.core.config import settings
-from app.core.database import Base
+from app.db.base_class import Base
+
+# Import all models to ensure they are registered with SQLAlchemy
+from app.db.base import Base  # noqa: F401
 
 async def init_db():
     # Create database directory if it doesn't exist

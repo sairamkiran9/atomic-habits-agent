@@ -6,7 +6,7 @@ from typing import Any
 from app.models.user import User
 from app.schemas.user import UserResponse
 from app.core.security import get_current_user
-from app.models.base import get_session
+from app.db.session import get_session
 
 router = APIRouter()
 security = HTTPBearer()
@@ -46,4 +46,4 @@ async def get_current_user_profile(
     Requires JWT token in Authorization header.
     """
     user = await get_current_user(credentials.credentials, db)
-    return user
+    return UserResponse.model_validate(user)
