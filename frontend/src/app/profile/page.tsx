@@ -15,18 +15,14 @@ export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Check if user is authenticated
     if (!AuthService.isAuthenticated()) {
       router.push('/login');
       return;
     }
-
-    // Get user from localStorage
+    
     const token = AuthService.getToken();
     if (token) {
       try {
-        // In a real app, you might want to verify the token with the backend
-        // For now, we'll parse the stored user data
         const userData = JSON.parse(localStorage.getItem('user') || '{}');
         setUser(userData);
       } catch (error) {
@@ -102,21 +98,21 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-100">
       <Container>
         <div className="py-8 space-y-8">
           {/* Profile Card */}
-          <Card className="bg-gray-800/50 text-white border-gray-700">
+          <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-lg">
             <div className="p-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 rounded-full bg-gray-700/50 flex items-center justify-center">
-                      <UserIcon size={32} className="text-primary" />
+                    <div className="w-16 h-16 rounded-full bg-violet-100 flex items-center justify-center">
+                      <UserIcon size={32} className="text-violet-600" />
                     </div>
                     <div>
-                      <h1 className="text-2xl font-bold">{user.name}</h1>
-                      <div className="flex items-center space-x-2 text-gray-300">
+                      <h1 className="text-2xl font-bold text-gray-900">{user.full_name}</h1>
+                      <div className="flex items-center space-x-2 text-gray-600">
                         <Mail size={16} />
                         <span>{user.email}</span>
                       </div>
@@ -124,24 +120,24 @@ export default function ProfilePage() {
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="flex items-center space-x-2 text-gray-300">
-                      <Award size={16} />
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <Award size={16} className="text-violet-500" />
                       <span>Current Streak: {stats.currentStreak} days</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-gray-300">
-                      <Award size={16} className="text-primary" />
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <Award size={16} className="text-violet-600" />
                       <span>Best Streak: {stats.maxStreak} days</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-gray-300">
-                      <Calendar size={16} />
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <Calendar size={16} className="text-violet-500" />
                       <span>Joined {joinDate}</span>
                     </div>
                   </div>
                 </div>
                 
                 <Button 
-                  variant="ghost" 
-                  className="mt-4 md:mt-0 text-gray-300 hover:text-white hover:bg-gray-700"
+                  variant="outline"
+                  className="mt-4 md:mt-0 text-gray-600 hover:text-gray-900 hover:bg-gray-100 border-gray-200"
                   onClick={handleLogout}
                 >
                   <LogOut size={16} className="mr-2" />
@@ -151,16 +147,16 @@ export default function ProfilePage() {
             </div>
           </Card>
 
-          {/* Streak Graph (existing) */}
-          <Card className="bg-gray-800/50 text-white border-gray-700">
-            <div className="p-6">
-              <h2 className="text-xl font-bold mb-4">Activity Overview</h2>
+          {/* Streak Graph */}
+          <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-lg">
+            {/* <div className="p-6"> */}
+              {/* <h2 className="text-xl font-bold text-gray-900 mb-4">Activity Overview</h2> */}
               <StreakGraph
                 data={streakData}
                 totalActiveDays={stats.totalActiveDays}
                 maxStreak={stats.maxStreak}
               />
-            </div>
+            {/* </div> */}
           </Card>
         </div>
       </Container>

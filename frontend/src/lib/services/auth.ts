@@ -92,7 +92,6 @@ export class AuthService {
 
   static setToken(token: string): void {
     localStorage.setItem('token', token);
-    console.log(token);
   }
 
   static removeToken(): void {
@@ -106,7 +105,6 @@ export class AuthService {
 
   static setUser(user: User): void {
     localStorage.setItem('user', JSON.stringify(user));
-    console.log(user);
   }
 
   static removeUser(): void {

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,6 @@ export default function LoginPage() {
       setError("");
       const response = await AuthService.login(data);
       AuthService.setToken(response.access_token);
-      // Redirect to dashboard or home page after successful login
       router.push("/habits");
     } catch (error) {
       console.error('Login error:', error);
@@ -32,23 +31,24 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
-      <div className="container mx-auto px-4 py-16">
+    <main className="min-h-screen flex flex-col bg-gradient-to-br from-purple-50 to-violet-100">
+      <div className="flex-1 container mx-auto px-4 py-16">
         <div className="max-w-md mx-auto space-y-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold">Welcome Back</h1>
-            <p className="text-gray-300 mt-2">Sign in to your account</p>
+            <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
+            <p className="text-gray-600 mt-2">Sign in to your account</p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 bg-gray-800/50 p-6 rounded-lg shadow-xl">
+          <form onSubmit={handleSubmit(onSubmit)} 
+                className="space-y-6 bg-white/80 backdrop-blur-sm p-8 rounded-lg shadow-lg">
             {error && (
-              <div className="p-3 rounded bg-red-500/10 text-red-500 text-sm">
+              <div className="p-3 rounded bg-red-50 text-red-500 text-sm">
                 {error}
               </div>
             )}
             
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
+              <label htmlFor="email" className="text-sm font-medium text-gray-700">
                 Email
               </label>
               <Input
@@ -62,15 +62,15 @@ export default function LoginPage() {
                   },
                 })}
                 placeholder="Enter your email"
-                className="bg-gray-700/50"
+                className="bg-white/90"
               />
               {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
+                <p className="text-sm text-red-500">{errors.email.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
+              <label htmlFor="password" className="text-sm font-medium text-gray-700">
                 Password
               </label>
               <Input
@@ -80,36 +80,52 @@ export default function LoginPage() {
                   required: "Password is required",
                 })}
                 placeholder="Enter your password"
-                className="bg-gray-700/50"
+                className="bg-white/90"
               />
               {errors.password && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
+                <p className="text-sm text-red-500">{errors.password.message}</p>
               )}
             </div>
 
             <div className="flex items-center justify-between">
-              <label className="flex items-center space-x-2 text-sm">
-                <input type="checkbox" className="rounded border-gray-600" />
+              <label className="flex items-center space-x-2 text-sm text-gray-600">
+                <input type="checkbox" className="rounded border-gray-300" />
                 <span>Remember me</span>
               </label>
-              <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+              <Link 
+                href="/forgot-password" 
+                className="text-sm text-violet-600 hover:text-violet-700 hover:underline"
+              >
                 Forgot password?
               </Link>
             </div>
 
-            <Button type="submit" className="w-full">
+            <Button 
+              type="submit" 
+              className="w-full bg-violet-600 hover:bg-violet-700 text-white"
+            >
               Sign In
             </Button>
 
-            <p className="text-center text-sm text-gray-300">
+            <p className="text-center text-sm text-gray-600">
               Don't have an account?{" "}
-              <Link href="/register" className="text-primary hover:underline">
+              <Link 
+                href="/register" 
+                className="text-violet-600 hover:text-violet-700 hover:underline"
+              >
                 Sign up
               </Link>
             </p>
           </form>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-white py-6">
+        <div className="max-w-7xl mx-auto px-4 text-center text-gray-600">
+          <p>&copy; {new Date().getFullYear()} Atomic Habits Tracker. All rights reserved.</p>
+        </div>
+      </footer>
     </main>
   );
 }

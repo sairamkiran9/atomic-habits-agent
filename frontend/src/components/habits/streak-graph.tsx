@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import { reverse } from 'dns';
+import React, { useMemo, useState } from 'react';
 
 interface StreakData {
   date: string;
@@ -11,7 +12,7 @@ interface StreakGraphProps {
   maxStreak: number;
 }
 
-export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays, maxStreak }) => {     
+export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays, maxStreak }) => {
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   // Create a date map for O(1) lookups
@@ -22,15 +23,14 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
     }, {} as Record<string, number>);
   }, [data]);
 
-  // Generate timeline data
-  const timelineData = useMemo(() => {
-
+  // Generate timeline data organized by years
+  const { yearsData, availableYears, defaultYear } = useMemo(() => {
     const endDate = new Date();
     const startDate = new Date();
 
     startDate.setFullYear(endDate.getFullYear() - 1);
     startDate.setDate(1);
-    startDate.setMonth(1);
+    startDate.setMonth(0);
 
     const years: { year: number; months: { month: string; weeks: Date[][] }[] }[] = [];
     const months: { month: string; weeks: Date[][] }[] = [];
@@ -65,9 +65,16 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
       // Move to next day
       currentDate.setDate(currentDate.getDate() + 1);
     }
-    console.log(years)
-    return years[1].months;
+    const yearsList = years.map(item => item.year).sort((a,b) => b-a);
+
+    return {
+      yearsData: years,
+      availableYears: yearsList,
+      defaultYear: yearsList[0]
+    };
   }, []);
+
+  const [selectedYear, setSelectedYear] = useState(defaultYear);
 
   // Get color based on activity count
   const getColor = (count: number) => {
@@ -79,21 +86,41 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
   };
 
   // Get activity count for a date
-  const getActivityCount = (date: Date) => {
+  const getActivityCount = (date: Date | null) => {
     if (!date) return -1;
-
     const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     return dateMap[dateStr] || 0;
   };
 
+  const timelineData = yearsData.find(y => y.year == selectedYear)?.months;
+
   return (
     <div className="w-full p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Activity Overview</h2>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-600">Select Year:</span>
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            className="px-3 py-1 border border-gray-300 rounded-md text-sm bg-white 
+                     focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          >
+            {availableYears.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <div className="grid">
         {/* Month Headers */}
         <div className="grid grid-cols-[auto,1fr] gap-4">
-          <div className="w-12" /> {/* Spacer for weekday column */}
+          <div className="w-12" />
           <div className="grid grid-cols-12 gap-4">
-            {timelineData.map((month, index) => (
+            {timelineData && timelineData.map((month, index) => (
               <div key={index} className="text-sm text-gray-600 font-medium">
                 {month.month}
               </div>
@@ -114,7 +141,7 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
 
           {/* Activity Grid */}
           <div className="grid grid-cols-12 gap-4">
-            {timelineData.map((month, monthIndex) => (
+          {timelineData && timelineData.map((month, monthIndex) => (
               <div key={monthIndex} className="flex flex-col gap-2">
                 {weekDays.map((_, dayIndex) => (
                   <div key={dayIndex} className="flex gap-1">
@@ -146,6 +173,7 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
                     })}
                   </div>
                 ))}
+
               </div>
             ))}
           </div>
@@ -154,11 +182,11 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
         {/* Legend */}
         <div className="flex items-center justify-end space-x-2 text-xs text-gray-600 mt-4">
           <span>Less</span>
-          <div className="flex gap-1">
-            <div className="w-4 h-4 bg-gray-200 rounded-sm" />
-            <div className="w-4 h-4 bg-green-200 rounded-sm" />
-            <div className="w-4 h-4 bg-green-400 rounded-sm" />
-            <div className="w-4 h-4 bg-green-600 rounded-sm" />
+          <div className="flex gap-2">
+            <div className="w-[15px] h-[15px] bg-gray-200 rounded" />
+            <div className="w-[15px] h-[15px] bg-green-200 rounded" />
+            <div className="w-[15px] h-[15px] bg-green-400 rounded" />
+            <div className="w-[15px] h-[15px] bg-green-600 rounded" />
           </div>
           <span>More</span>
         </div>

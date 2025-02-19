@@ -76,11 +76,11 @@ export function RegisterDialog() {
             <Input
               id="name"
               type="text"
-              {...register("name", { required: "Name is required" })}
+              {...register("full_name", { required: "Name is required" })}
               placeholder="Enter your name"
             />
-            {errors.name && (
-              <p className="text-sm text-destructive">{errors.name.message}</p>
+            {errors.full_name && (
+              <p className="text-sm text-destructive">{errors.full_name.message}</p>
             )}
           </div>
 
