@@ -1,7 +1,8 @@
 "use client"
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -12,30 +13,43 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AuthService } from "@/lib/services/auth";
 
 interface RegisterFormData {
-  name: string;
+  full_name: string;
   email: string;
   password: string;
   confirmPassword: string;
 }
 
 export function RegisterDialog() {
+  const router = useRouter();
+  const [error, setError] = useState<string>("");
+  const [open, setOpen] = useState(false);
   const form = useForm<RegisterFormData>();
   const { register, handleSubmit, formState: { errors }, watch } = form;
   const password = watch("password");
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      // Here you would typically make an API call to register the user
-      console.log('Registration data:', data);
+      setError("");
+      // Remove confirmPassword as it's not needed for the API
+      const { confirmPassword, ...registerData } = data;
+      
+      const response = await AuthService.register(registerData);
+      AuthService.setToken(response.access_token);
+      
+      // Close the dialog and redirect to habits page
+      setOpen(false);
+      router.push("/login");
     } catch (error) {
       console.error('Registration error:', error);
+      setError(error instanceof Error ? error.message : "Registration failed. Please try again.");
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button className="btn-lg btn-primary">
           Get Started
@@ -49,6 +63,12 @@ export function RegisterDialog() {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
+          {error && (
+            <div className="p-3 rounded bg-red-500/10 text-red-500 text-sm">
+              {error}
+            </div>
+          )}
+
           <div className="space-y-2">
             <label htmlFor="name" className="text-sm font-medium">
               Name

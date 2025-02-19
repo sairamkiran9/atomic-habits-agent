@@ -1,10 +1,41 @@
 "use client"
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Container } from '@/components/layout/container';
 import { StreakGraph } from '@/components/habits/streak-graph';
+import { AuthService } from '@/lib/services/auth';
+import { User } from '@/lib/types/auth';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { User as UserIcon, Mail, Award, Calendar, LogOut } from 'lucide-react';
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    // Check if user is authenticated
+    if (!AuthService.isAuthenticated()) {
+      router.push('/login');
+      return;
+    }
+
+    // Get user from localStorage
+    const token = AuthService.getToken();
+    if (token) {
+      try {
+        // In a real app, you might want to verify the token with the backend
+        // For now, we'll parse the stored user data
+        const userData = JSON.parse(localStorage.getItem('user') || '{}');
+        setUser(userData);
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        router.push('/login');
+      }
+    }
+  }, [router]);
+
   const generateMockData = () => {
     const data = [];
     const today = new Date();
@@ -12,7 +43,6 @@ export default function ProfilePage() {
     oneYearAgo.setFullYear(today.getFullYear() - 1);
     
     for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
-      // Generate more realistic data patterns
       const dayOfWeek = d.getDay();
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
       const baseCount = isWeekend ? Math.random() > 0.7 ? 1 : 0 : Math.random() > 0.3 ? 2 : 1;
@@ -29,7 +59,6 @@ export default function ProfilePage() {
 
   const streakData = useMemo(() => generateMockData(), []);
 
-  // Calculate stats
   const stats = useMemo(() => {
     let currentStreak = 0;
     let maxStreak = 0;
@@ -54,15 +83,85 @@ export default function ProfilePage() {
     };
   }, [streakData]);
 
+  const handleLogout = () => {
+    AuthService.removeToken();
+    localStorage.removeItem('user');
+    router.push('/login');
+  };
+
+  const joinDate = useMemo(() => {
+    return new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }, []);
+
+  if (!user) {
+    return null;
+  }
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       <Container>
-        <div className="py-8">
-          <StreakGraph
-            data={streakData}
-            totalActiveDays={stats.totalActiveDays}
-            maxStreak={stats.maxStreak}
-          />
+        <div className="py-8 space-y-8">
+          {/* Profile Card */}
+          <Card className="bg-gray-800/50 text-white border-gray-700">
+            <div className="p-6">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 rounded-full bg-gray-700/50 flex items-center justify-center">
+                      <UserIcon size={32} className="text-primary" />
+                    </div>
+                    <div>
+                      <h1 className="text-2xl font-bold">{user.name}</h1>
+                      <div className="flex items-center space-x-2 text-gray-300">
+                        <Mail size={16} />
+                        <span>{user.email}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="flex items-center space-x-2 text-gray-300">
+                      <Award size={16} />
+                      <span>Current Streak: {stats.currentStreak} days</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-gray-300">
+                      <Award size={16} className="text-primary" />
+                      <span>Best Streak: {stats.maxStreak} days</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-gray-300">
+                      <Calendar size={16} />
+                      <span>Joined {joinDate}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <Button 
+                  variant="ghost" 
+                  className="mt-4 md:mt-0 text-gray-300 hover:text-white hover:bg-gray-700"
+                  onClick={handleLogout}
+                >
+                  <LogOut size={16} className="mr-2" />
+                  Logout
+                </Button>
+              </div>
+            </div>
+          </Card>
+
+          {/* Streak Graph (existing) */}
+          <Card className="bg-gray-800/50 text-white border-gray-700">
+            <div className="p-6">
+              <h2 className="text-xl font-bold mb-4">Activity Overview</h2>
+              <StreakGraph
+                data={streakData}
+                totalActiveDays={stats.totalActiveDays}
+                maxStreak={stats.maxStreak}
+              />
+            </div>
+          </Card>
         </div>
       </Container>
     </div>

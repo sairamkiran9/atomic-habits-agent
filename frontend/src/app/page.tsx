@@ -23,12 +23,12 @@ export default function Home() {
               Login
             </Link>
             {/* Temporary link for development */}
-            <Link
+            {/* <Link
               href="/habits"
               className="btn-lg bg-secondary text-primary hover:bg-secondary/80"
             >
               View Habits (Dev)
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

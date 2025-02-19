@@ -4,6 +4,9 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { AuthService } from "@/lib/services/auth";
+import { useState } from "react";
 
 interface LoginFormData {
   email: string;
@@ -11,14 +14,20 @@ interface LoginFormData {
 }
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [error, setError] = useState<string>("");
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      // Here you would typically make an API call to login the user
-      console.log('Login data:', data);
+      setError("");
+      const response = await AuthService.login(data);
+      AuthService.setToken(response.access_token);
+      // Redirect to dashboard or home page after successful login
+      router.push("/habits");
     } catch (error) {
       console.error('Login error:', error);
+      setError(error instanceof Error ? error.message : "Failed to login. Please try again.");
     }
   };
 
@@ -32,6 +41,12 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 bg-gray-800/50 p-6 rounded-lg shadow-xl">
+            {error && (
+              <div className="p-3 rounded bg-red-500/10 text-red-500 text-sm">
+                {error}
+              </div>
+            )}
+            
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
                 Email
@@ -88,7 +103,7 @@ export default function LoginPage() {
 
             <p className="text-center text-sm text-gray-300">
               Don't have an account?{" "}
-              <Link href="/" className="text-primary hover:underline">
+              <Link href="/register" className="text-primary hover:underline">
                 Sign up
               </Link>
             </p>

@@ -6,16 +6,25 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { HabitForm } from './habit-form';
-import { Check, Clock, Edit2, Flame, Trash2 } from 'lucide-react';
+import { Archive, Check, Clock, Edit2, Flame, Trash2 } from 'lucide-react';
 
 interface HabitListProps {
   habits: Habit[];
-  onHabitComplete: (id: string) => void;
-  onHabitUpdate: (id: string, data: Partial<Habit>) => void;
-  onHabitDelete: (id: string) => void;
+  onHabitComplete: (id: number) => void;
+  onHabitUpdate: (id: number, data: Partial<Habit>) => void;
+  onHabitDelete: (id: number) => void;
+  onArchiveHabit: (id: number) => void;
+  showArchiveButton?: boolean;
 }
 
-export function HabitList({ habits, onHabitComplete, onHabitUpdate, onHabitDelete }: HabitListProps) {
+export function HabitList({
+  habits,
+  onHabitComplete,
+  onHabitUpdate,
+  onHabitDelete,
+  onArchiveHabit,
+  showArchiveButton = true
+}: HabitListProps) {
   const getFrequencyColor = (frequency: string) => {
     switch (frequency) {
       case 'daily':
@@ -31,6 +40,14 @@ export function HabitList({ habits, onHabitComplete, onHabitUpdate, onHabitDelet
 
   const handleUpdate = (habit: Habit) => (data: Partial<Habit>) => {
     onHabitUpdate(habit.id, data);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
   };
 
   return (
@@ -54,17 +71,22 @@ export function HabitList({ habits, onHabitComplete, onHabitUpdate, onHabitDelet
             </div>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Flame className="h-4 w-4 text-orange-500" />
-                <span>{habit.streak} day streak</span>
-              </div>
-              {habit.timeOfDay && (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  <span>{habit.timeOfDay}</span>
+                  <Flame className="h-4 w-4 text-orange-500" />
+                  <span>{habit.streak} day streak</span>
                 </div>
-              )}
+                {habit.time_of_day && (
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    <span>{habit.time_of_day}</span>
+                  </div>
+                )}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Created: {formatDate(habit.created_at)}
+              </div>
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
@@ -85,6 +107,16 @@ export function HabitList({ habits, onHabitComplete, onHabitUpdate, onHabitDelet
                   </Button>
                 }
               />
+              {showArchiveButton && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onArchiveHabit(habit.id)}
+                  className="hover:text-primary"
+                >
+                  <Archive className="h-4 w-4" />
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="sm"

@@ -11,7 +11,7 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import type { Habit, HabitFrequency } from '@/lib/types/habit';
+import type { Habit, HabitFrequency, HabitCategory, CreateHabitData } from '@/lib/types/habit';
 import { 
   Dialog,
   DialogContent,
@@ -24,17 +24,24 @@ import { useState } from 'react';
 
 interface HabitFormProps {
   initialData?: Habit;
-  onSubmit: (data: Partial<Habit>) => void;
+  onSubmit: (data: CreateHabitData) => void;
   trigger?: React.ReactNode;
 }
 
 export function HabitForm({ initialData, onSubmit, trigger }: HabitFormProps) {
   const [open, setOpen] = useState(false);
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<Partial<Habit>>({
-    defaultValues: initialData
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<CreateHabitData>({
+    defaultValues: initialData ? {
+      title: initialData.title,
+      description: initialData.description,
+      frequency: initialData.frequency,
+      time_of_day: initialData.time_of_day,
+      category: initialData.category,
+      reminder_time: initialData.reminder_time,
+    } : undefined
   });
 
-  const onFormSubmit = (data: Partial<Habit>) => {
+  const onFormSubmit = (data: CreateHabitData) => {
     onSubmit(data);
     setOpen(false);
   };
@@ -43,16 +50,18 @@ export function HabitForm({ initialData, onSubmit, trigger }: HabitFormProps) {
     setValue('frequency', value);
   };
 
-  const handleCategoryChange = (value: string) => {
+  const handleCategoryChange = (value: HabitCategory) => {
     setValue('category', value);
   };
 
-  const categories = [
+  const categories: HabitCategory[] = [
     'Mindfulness',
     'Learning',
     'Productivity',
     'Health',
     'Fitness',
+    'Career',
+    'Social',
     'Other'
   ];
 
@@ -78,10 +87,13 @@ export function HabitForm({ initialData, onSubmit, trigger }: HabitFormProps) {
         </label>
         <Textarea
           id="description"
-          {...register("description")}
+          {...register("description", { required: "Description is required" })}
           placeholder="Enter habit description"
           className="min-h-[100px]"
         />
+        {errors.description && (
+          <p className="text-sm text-destructive">{errors.description.message}</p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -117,7 +129,7 @@ export function HabitForm({ initialData, onSubmit, trigger }: HabitFormProps) {
             </SelectTrigger>
             <SelectContent>
               {categories.map((category) => (
-                <SelectItem key={category} value={category.toLowerCase()}>
+                <SelectItem key={category} value={category}>
                   {category}
                 </SelectItem>
               ))}
@@ -128,24 +140,24 @@ export function HabitForm({ initialData, onSubmit, trigger }: HabitFormProps) {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label htmlFor="timeOfDay" className="text-sm font-medium">
+          <label htmlFor="time_of_day" className="text-sm font-medium">
             Time of Day
           </label>
           <Input
-            id="timeOfDay"
+            id="time_of_day"
             type="time"
-            {...register("timeOfDay")}
+            {...register("time_of_day")}
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="reminderTime" className="text-sm font-medium">
+          <label htmlFor="reminder_time" className="text-sm font-medium">
             Reminder Time
           </label>
           <Input
-            id="reminderTime"
+            id="reminder_time"
             type="time"
-            {...register("reminderTime")}
+            {...register("reminder_time")}
           />
         </div>
       </div>

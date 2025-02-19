@@ -1,15 +1,4 @@
-"use client"
-
-import { useEffect, useMemo, useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { Tooltip } from '@/components/ui/tooltip';
-import { ChevronDown } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import React, { useMemo } from 'react';
 
 interface StreakData {
   date: string;
@@ -22,144 +11,158 @@ interface StreakGraphProps {
   maxStreak: number;
 }
 
-export function StreakGraph({ data, totalActiveDays, maxStreak }: StreakGraphProps) {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  
-  // Get last 12 months of data
-  const last12Months = useMemo(() => {
-    const today = new Date();
-    const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(today.getFullYear() - 1);
-    
-    const monthsData = [];
-    for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
-      const month = d.getMonth();
-      const dateStr = d.toISOString().split('T')[0];
-      monthsData.push({
-        date: dateStr,
-        count: data.find(item => item.date === dateStr)?.count || 0,
-        month: months[month]
-      });
-    }
-    return monthsData;
+export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays, maxStreak }) => {     
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  // Create a date map for O(1) lookups
+  const dateMap = useMemo(() => {
+    return data.reduce((acc, item) => {
+      acc[item.date] = item.count;
+      return acc;
+    }, {} as Record<string, number>);
   }, [data]);
 
-  const totalSubmissions = useMemo(() => 
-    data.reduce((sum, day) => sum + day.count, 0),
-    [data]
-  );
+  // Generate timeline data
+  const timelineData = useMemo(() => {
 
-  const getIntensityClass = (count: number) => {
-    if (count === 0) return 'bg-[#e6e6e6]';
-    if (count <= 2) return 'bg-[#9be9a8]';
-    if (count <= 4) return 'bg-[#40c463]';
-    if (count <= 6) return 'bg-[#30a14e]';
-    return 'bg-[#216e39]';
+    const endDate = new Date();
+    const startDate = new Date();
+
+    startDate.setFullYear(endDate.getFullYear() - 1);
+    startDate.setDate(1);
+    startDate.setMonth(1);
+
+    const years: { year: number; months: { month: string; weeks: Date[][] }[] }[] = [];
+    const months: { month: string; weeks: Date[][] }[] = [];
+    let currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
+      const monthKey = currentDate.toLocaleString('default', { month: 'short' });
+      let currentYear = years.find(y => y.year === currentDate.getFullYear());
+      if (!currentYear) {
+        currentYear = { year: currentDate.getFullYear(), months: [] };
+        years.push(currentYear)
+      }
+
+      let currentMonth = currentYear.months.find(m => m ? m.month == monthKey: undefined);
+
+      if (!currentMonth) {
+        currentMonth = { month: monthKey, weeks: [] };
+        months.push(currentMonth);
+      }
+
+      // Find or create the current week
+      let currentWeek = currentMonth.weeks[currentMonth.weeks.length - 1];
+
+      if (!currentWeek || currentWeek.length === 7) {
+        currentWeek = [];
+        currentMonth.weeks.push(currentWeek);
+        currentYear.months[currentDate.getMonth()] = currentMonth;
+      }
+
+      currentWeek[currentDate.getDay()] = new Date(currentDate);
+
+      // Move to next day
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    console.log(years)
+    return years[1].months;
+  }, []);
+
+  // Get color based on activity count
+  const getColor = (count: number) => {
+    if (count === - 1) return '';
+    if (count === 0) return 'bg-gray-200';
+    if (count <= 3) return 'bg-green-200';
+    if (count <= 6) return 'bg-green-400';
+    return 'bg-green-600';
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  // Get activity count for a date
+  const getActivityCount = (date: Date) => {
+    if (!date) return -1;
+
+    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    return dateMap[dateStr] || 0;
   };
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold text-gray-700">{totalSubmissions}</span>
-          <span className="text-gray-600">submissions in the past one year</span>
-        </div>
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2">
-            <span className="text-gray-600">Total active days:</span>
-            <span className="font-bold text-gray-700">{totalActiveDays}</span>
+    <div className="w-full p-4">
+      <div className="grid">
+        {/* Month Headers */}
+        <div className="grid grid-cols-[auto,1fr] gap-4">
+          <div className="w-12" /> {/* Spacer for weekday column */}
+          <div className="grid grid-cols-12 gap-4">
+            {timelineData.map((month, index) => (
+              <div key={index} className="text-sm text-gray-600 font-medium">
+                {month.month}
+              </div>
+            ))}
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-gray-600">Max streak:</span>
-            <span className="font-bold text-gray-700">{maxStreak}</span>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50">
-              Current
-              <ChevronDown className="w-4 h-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>Last Year</DropdownMenuItem>
-              <DropdownMenuItem>Current Year</DropdownMenuItem>
-              <DropdownMenuItem>All Time</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-
-      <div className="relative">
-        {/* Months */}
-        <div className="flex text-xs text-gray-500 mb-2 pl-8">
-          {Array.from(new Set(last12Months.map(d => d.month))).map((month, i) => (
-            <div key={`${month}-${i}`} className="w-[29px]">{month}</div>
-          ))}
         </div>
 
-        {/* Graph */}
-        <div className="flex">
-          {/* Days */}
-          <div className="flex flex-col justify-between h-[130px] mr-2 text-xs text-gray-500">
-            <span>Mon</span>
-            <span>Wed</span>
-            <span>Fri</span>
+        {/* Main Grid */}
+        <div className="grid grid-cols-[auto,1fr] gap-4 mt-2">
+          {/* Weekday Labels */}
+          <div className="flex flex-col gap-2">
+            {weekDays.map((day, index) => (
+              <div key={index} className="text-sm text-gray-600 h-6 flex items-center">
+                {day}
+              </div>
+            ))}
           </div>
 
-          {/* Squares */}
-          <div className="grid grid-flow-col gap-[3px] auto-cols-[18px]">
-            {Array.from({ length: 52 }).map((_, weekIndex) => (
-              <div key={weekIndex} className="grid grid-rows-7 gap-[3px]">
-                {Array.from({ length: 7 }).map((_, dayIndex) => {
-                  const dataIndex = weekIndex * 7 + dayIndex;
-                  const dayData = last12Months[dataIndex];
-                  return dayData ? (
-                    <Tooltip
-                      key={dayIndex}
-                      content={
-                        <div className="text-xs">
-                          <div>{dayData.count} submissions on</div>
-                          <div>{formatDate(dayData.date)}</div>
+          {/* Activity Grid */}
+          <div className="grid grid-cols-12 gap-4">
+            {timelineData.map((month, monthIndex) => (
+              <div key={monthIndex} className="flex flex-col gap-2">
+                {weekDays.map((_, dayIndex) => (
+                  <div key={dayIndex} className="flex gap-1">
+                    {month.weeks.map((week, weekIndex) => {
+                      const date = week[dayIndex];
+                      
+                      const count = getActivityCount(date);
+                      return (
+                        <div
+                          key={weekIndex}
+                          className={`
+                            w-6 h-6
+                            ${getColor(count)}
+                            rounded-sm
+                            transition-all duration-100
+                            hover:ring-1 hover:ring-gray-400
+                            group
+                            relative
+                          `}
+                        >
+                          {/* Tooltip */}
+                          <div className="invisible group-hover:visible absolute z-20 px-2 py-1 text-xs 
+                                      text-white bg-gray-900 rounded-md -top-8 left-1/2 transform -translate-x-1/2
+                                      whitespace-nowrap shadow-lg">
+                            {`${count} contributions on ${date ? date.toLocaleDateString() : 0}`}
+                          </div>
                         </div>
-                      }
-                    >
-                      <div
-                        className={`w-[18px] h-[18px] rounded-sm ${getIntensityClass(dayData.count)}`}
-                      />
-                    </Tooltip>
-                  ) : (
-                    <div
-                      key={dayIndex}
-                      className="w-[18px] h-[18px] rounded-sm bg-[#e6e6e6]"
-                    />
-                  );
-                })}
+                      );
+                    })}
+                  </div>
+                ))}
               </div>
             ))}
           </div>
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-2 mt-4 text-xs text-gray-500 justify-end">
+        <div className="flex items-center justify-end space-x-2 text-xs text-gray-600 mt-4">
           <span>Less</span>
-          <div className="flex gap-[3px]">
-            <div className="w-[18px] h-[18px] rounded-sm bg-[#e6e6e6]" />
-            <div className="w-[18px] h-[18px] rounded-sm bg-[#9be9a8]" />
-            <div className="w-[18px] h-[18px] rounded-sm bg-[#40c463]" />
-            <div className="w-[18px] h-[18px] rounded-sm bg-[#30a14e]" />
-            <div className="w-[18px] h-[18px] rounded-sm bg-[#216e39]" />
+          <div className="flex gap-1">
+            <div className="w-4 h-4 bg-gray-200 rounded-sm" />
+            <div className="w-4 h-4 bg-green-200 rounded-sm" />
+            <div className="w-4 h-4 bg-green-400 rounded-sm" />
+            <div className="w-4 h-4 bg-green-600 rounded-sm" />
           </div>
           <span>More</span>
         </div>
       </div>
-    </Card>
+    </div>
   );
-}
+};
