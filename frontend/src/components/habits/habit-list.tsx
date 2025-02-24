@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react';
-import { Habit } from '@/lib/types/habit';
+import { Habit, CreateHabitData } from '@/lib/types/habit';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 interface HabitListProps {
   habits: Habit[];
   onHabitComplete: (id: number) => void;
-  onHabitUpdate: (id: number, data: Partial<Habit>) => void;
+  onHabitUpdate: (id: number, data: Partial<CreateHabitData>) => void;
   onHabitDelete: (id: number) => void;
   onArchiveHabit: (id: number) => void;
   showArchiveButton?: boolean;
@@ -39,7 +39,7 @@ export function HabitList({
     }
   };
 
-  const handleUpdate = (habit: Habit) => (data: Partial<Habit>) => {
+  const handleUpdate = (habit: Habit) => (data: Partial<CreateHabitData>) => {
     onHabitUpdate(habit.id, data);
   };
 

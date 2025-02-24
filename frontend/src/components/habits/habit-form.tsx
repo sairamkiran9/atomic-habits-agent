@@ -20,15 +20,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface HabitFormProps {
   initialData?: Habit;
+  defaultCategory?: string;
   onSubmit: (data: CreateHabitData) => void;
   trigger?: React.ReactNode;
 }
 
-export function HabitForm({ initialData, onSubmit, trigger }: HabitFormProps) {
+export function HabitForm({ initialData, defaultCategory, onSubmit, trigger }: HabitFormProps) {
   const [open, setOpen] = useState(false);
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<CreateHabitData>({
     defaultValues: initialData ? {
@@ -38,8 +39,17 @@ export function HabitForm({ initialData, onSubmit, trigger }: HabitFormProps) {
       time_of_day: initialData.time_of_day,
       category: initialData.category,
       reminder_time: initialData.reminder_time,
-    } : undefined
+    } : {
+      category: defaultCategory as HabitCategory
+    }
   });
+
+  // Set default category when it changes and form is not initialized with initialData
+  useEffect(() => {
+    if (!initialData && defaultCategory) {
+      setValue('category', defaultCategory as HabitCategory);
+    }
+  }, [defaultCategory, initialData, setValue]);
 
   const onFormSubmit = (data: CreateHabitData) => {
     onSubmit(data);
@@ -122,7 +132,7 @@ export function HabitForm({ initialData, onSubmit, trigger }: HabitFormProps) {
           </label>
           <Select 
             onValueChange={handleCategoryChange}
-            defaultValue={initialData?.category}
+            defaultValue={initialData?.category || defaultCategory}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select category" />
