@@ -7,37 +7,70 @@ import { Sidebar } from '@/components/habits/sidebar';
 import { HabitForm } from '@/components/habits/habit-form';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { type Habit, type HabitCategory, type CreateHabitData } from '@/lib/types/habit';
+import { 
+  type Habit, 
+  type CreateHabitData,
+  type UpdateHabitData 
+} from '@/lib/services/habits';
 import { HabitsService } from '@/lib/services/habits';
 import { useRouter } from 'next/navigation';
 import { AuthService } from '@/lib/services/auth';
 
+// Type definitions
+interface CategoryCounts {
+  [key: string]: number;
+  All: number;
+  Archived: number;
+  Mindfulness: number;
+  Learning: number;
+  Productivity: number;
+  Health: number;
+  Fitness: number;
+  Career: number;
+  Social: number;
+  Other: number;
+}
+
+/**
+ * HabitsPage Component - Main page for managing habits
+ * Handles habit listing, filtering, and CRUD operations
+ */
 export default function HabitsPage() {
+  // Hooks
   const router = useRouter();
+  
+  // State management
   const [habits, setHabits] = useState<Habit[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [showArchived, setShowArchived] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [showArchived, setShowArchived] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Authentication check and initial data fetch
   useEffect(() => {
-    if (!AuthService.isAuthenticated()) {
-      router.push('/login');
-      return;
-    }
+    const checkAuthAndFetchHabits = async () => {
+      if (!AuthService.isAuthenticated()) {
+        router.push('/login');
+        return;
+      }
+      await fetchHabits();
+    };
 
-    fetchHabits();
+    checkAuthAndFetchHabits();
   }, [router]);
 
-  const fetchHabits = async () => {
+  // Data fetching
+  const fetchHabits = async (): Promise<void> => {
     try {
       setError(null);
       const fetchedHabits = await HabitsService.getHabits();
       setHabits(fetchedHabits);
     } catch (error) {
-      console.error('Error fetching habits:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      console.error('Error fetching habits:', errorMessage);
       setError('Failed to load habits. Please try again.');
-      if (error instanceof Error && error.message.includes('401')) {
+      
+      if (errorMessage.includes('401')) {
         AuthService.logout();
         router.push('/login');
       }
@@ -46,6 +79,7 @@ export default function HabitsPage() {
     }
   };
 
+  // Memoized computations
   const filteredHabits = useMemo(() => {
     return habits.filter(habit => {
       const matchesArchived = showArchived === habit.is_archived;
@@ -54,8 +88,8 @@ export default function HabitsPage() {
     });
   }, [habits, selectedCategory, showArchived]);
 
-  const categoryCount = useMemo(() => {
-    const counts: Record<string, number> = {
+  const categoryCount = useMemo<CategoryCounts>(() => {
+    const counts: CategoryCounts = {
       All: 0,
       Archived: 0,
       Mindfulness: 0,
@@ -71,41 +105,35 @@ export default function HabitsPage() {
     habits.forEach(habit => {
       if (!habit.is_archived) {
         counts[habit.category]++;
-        counts['All']++;
+        counts.All++;
       } else {
-        counts['Archived']++;
+        counts.Archived++;
       }
     });
 
     return counts;
   }, [habits]);
 
-  const handleAddHabit = async (data: CreateHabitData) => {
+  // Event handlers
+  const handleAddHabit = async (data: CreateHabitData): Promise<void> => {
     try {
       setError(null);
-      const newHabit = await HabitsService.createHabit({
-        title: data.title,
-        description: data.description,
-        frequency: data.frequency,
-        time_of_day: data.time_of_day,
-        category: data.category,
-        reminder_time: data.reminder_time,
-      });
+      const newHabit = await HabitsService.createHabit(data);
       setHabits(prevHabits => [...prevHabits, newHabit]);
     } catch (error) {
-      console.error('Error creating habit:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      console.error('Error creating habit:', errorMessage);
       setError('Failed to create habit. Please try again.');
     }
   };
 
-  const handleHabitComplete = async (id: number) => {
+  const handleHabitComplete = async (id: number): Promise<void> => {
     try {
       setError(null);
       const habit = habits.find(h => h.id === id);
       if (!habit) return;
 
       const updatedHabit = await HabitsService.updateHabit(id, {
-        ...habit,
         completed: !habit.completed
       });
 
@@ -113,12 +141,13 @@ export default function HabitsPage() {
         prevHabits.map(h => h.id === id ? updatedHabit : h)
       );
     } catch (error) {
-      console.error('Error updating habit:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      console.error('Error updating habit:', errorMessage);
       setError('Failed to update habit. Please try again.');
     }
   };
 
-  const handleHabitUpdate = async (id: number, data: Partial<Habit>) => {
+  const handleHabitUpdate = async (id: number, data: UpdateHabitData): Promise<void> => {
     try {
       setError(null);
       const updatedHabit = await HabitsService.updateHabit(id, data);
@@ -126,30 +155,31 @@ export default function HabitsPage() {
         prevHabits.map(h => h.id === id ? updatedHabit : h)
       );
     } catch (error) {
-      console.error('Error updating habit:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      console.error('Error updating habit:', errorMessage);
       setError('Failed to update habit. Please try again.');
     }
   };
 
-  const handleHabitDelete = async (id: number) => {
+  const handleHabitDelete = async (id: number): Promise<void> => {
     try {
       setError(null);
       await HabitsService.deleteHabit(id);
       setHabits(prevHabits => prevHabits.filter(h => h.id !== id));
     } catch (error) {
-      console.error('Error deleting habit:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      console.error('Error deleting habit:', errorMessage);
       setError('Failed to delete habit. Please try again.');
     }
   };
 
-  const handleArchiveHabit = async (id: number) => {
+  const handleArchiveHabit = async (id: number): Promise<void> => {
     try {
       setError(null);
       const habit = habits.find(h => h.id === id);
       if (!habit) return;
 
       const updatedHabit = await HabitsService.updateHabit(id, {
-        ...habit,
         is_archived: !habit.is_archived
       });
 
@@ -157,11 +187,13 @@ export default function HabitsPage() {
         prevHabits.map(h => h.id === id ? updatedHabit : h)
       );
     } catch (error) {
-      console.error('Error archiving habit:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      console.error('Error archiving habit:', errorMessage);
       setError('Failed to archive habit. Please try again.');
     }
   };
 
+  // Loading state
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800">
@@ -173,6 +205,7 @@ export default function HabitsPage() {
     );
   }
 
+  // Main render
   return (
     <div className="flex h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       <Sidebar
@@ -185,12 +218,14 @@ export default function HabitsPage() {
       <main className="flex-1 overflow-y-auto">
         <Container>
           <div className="py-8">
+            {/* Error display */}
             {error && (
               <div className="mb-4 p-4 bg-red-500/10 text-red-500 rounded-lg">
                 {error}
               </div>
             )}
 
+            {/* Header section */}
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h1 className="text-3xl font-bold text-white">
@@ -203,6 +238,8 @@ export default function HabitsPage() {
                     : 'Track and manage your daily habits'}
                 </p>
               </div>
+              
+              {/* Add habit button */}
               {!showArchived && (
                 <HabitForm
                   onSubmit={handleAddHabit}
@@ -216,6 +253,7 @@ export default function HabitsPage() {
               )}
             </div>
 
+            {/* Habits list */}
             <HabitList
               habits={filteredHabits}
               onHabitComplete={handleHabitComplete}

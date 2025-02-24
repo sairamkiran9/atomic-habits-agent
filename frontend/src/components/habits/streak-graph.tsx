@@ -80,8 +80,8 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
   const getColor = (count: number) => {
     if (count === - 1) return '';
     if (count === 0) return 'bg-gray-200';
-    if (count <= 3) return 'bg-green-200';
-    if (count <= 6) return 'bg-green-400';
+    if (count <= 0.5) return 'bg-green-200';
+    if (count <= 0.75) return 'bg-green-400';
     return 'bg-green-600';
   };
 
@@ -166,7 +166,7 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
                           <div className="invisible group-hover:visible absolute z-20 px-2 py-1 text-xs 
                                       text-white bg-gray-900 rounded-md -top-8 left-1/2 transform -translate-x-1/2
                                       whitespace-nowrap shadow-lg">
-                            {`${count} contributions on ${date ? date.toLocaleDateString() : 0}`}
+                            {`${count*100}% tasks done on ${date ? date.toLocaleDateString() : 0}`}
                           </div>
                         </div>
                       );

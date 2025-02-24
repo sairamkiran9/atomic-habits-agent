@@ -4,15 +4,22 @@ import { useEffect, useMemo, useState } from 'react';
 import { Container } from '@/components/layout/container';
 import { StreakGraph } from '@/components/habits/streak-graph';
 import { AuthService } from '@/lib/services/auth';
+import { HabitsService } from '@/lib/services/habits';
 import { User } from '@/lib/types/auth';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { User as UserIcon, Mail, Award, Calendar, LogOut } from 'lucide-react';
 
+interface StreakData {
+  date: string;
+  count: number;
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [streakData, setStreakData] = useState<StreakData[]>([]);
 
   useEffect(() => {
     if (!AuthService.isAuthenticated()) {
@@ -32,28 +39,70 @@ export default function ProfilePage() {
     }
   }, [router]);
 
-  const generateMockData = () => {
-    const data = [];
-    const today = new Date();
-    const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(today.getFullYear() - 1);
-    
-    for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
-      const dayOfWeek = d.getDay();
-      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-      const baseCount = isWeekend ? Math.random() > 0.7 ? 1 : 0 : Math.random() > 0.3 ? 2 : 1;
-      const randomVariation = Math.floor(Math.random() * 3);
-      const count = Math.max(0, baseCount + randomVariation - (Math.random() > 0.8 ? 3 : 0));
-      
-      data.push({
-        date: d.toISOString().split('T')[0],
-        count
-      });
-    }
-    return data;
-  };
+  useEffect(() => {
+    const fetchStreakData = async () => {
+      const data = await generateStreakData();
+      setStreakData(data);
+    };
 
-  const streakData = useMemo(() => generateMockData(), []);
+    fetchStreakData();
+  }, []);
+
+  const generateStreakData = async (): Promise<StreakData[]> => {
+    try {
+      const habits = await HabitsService.getHabits();
+      const data: StreakData[] = [];
+      const today = new Date();
+      const oneYearAgo = new Date();
+      // oneYearAgo.setFullYear(today.getFullYear() - 1);
+      oneYearAgo.setMonth(today.getMonth() - 1)
+  
+      const dailyStreakMap = new Map<string, number[]>();
+  
+      // Initialize the map with dates for the past year
+      for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
+        const dateStr = d.toISOString().split('T')[0];
+        dailyStreakMap.set(dateStr, []);
+      }
+  
+      // Populate the map with habit streaks
+      habits.forEach(habit => {
+        const habitCreatedDate = new Date(habit.created_at);
+        let currentDate = new Date(Math.max(habitCreatedDate.getTime(), oneYearAgo.getTime()));
+  
+        while (currentDate <= today) {
+          const dateStr = currentDate.toISOString().split('T')[0];
+          const streaksForDay = dailyStreakMap.get(dateStr) || [];
+          streaksForDay.push(habit.streak || 0);
+          dailyStreakMap.set(dateStr, streaksForDay);
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      });
+  
+      // Calculate total streaks per day and format data
+      for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
+        const dateStr = d.toISOString().split('T')[0];
+        const streaksForDay = dailyStreakMap.get(dateStr) || [];
+        
+        // Sum up all streaks for the day
+        const totalStreak = streaksForDay.reduce(
+          (sum: number, streak: number): number => sum + streak, 
+          0
+        );
+
+        const avgStreak = streaksForDay.length > 0 ? totalStreak / streaksForDay.length : 0;
+  
+        data.push({
+          date: dateStr,
+          count: avgStreak
+        });
+      }
+      return data;
+    } catch (error) {
+      console.error('Error generating streak data:', error);
+      return [];
+    }
+  };
 
   const stats = useMemo(() => {
     let currentStreak = 0;
@@ -61,7 +110,10 @@ export default function ProfilePage() {
     let tempStreak = 0;
     let totalActiveDays = 0;
 
-    [...streakData].reverse().forEach(day => {
+    // Create a copy of the array to reverse
+    const reversedData = [...streakData].reverse();
+    
+    reversedData.forEach(day => {
       if (day.count > 0) {
         tempStreak++;
         totalActiveDays++;
@@ -149,14 +201,11 @@ export default function ProfilePage() {
 
           {/* Streak Graph */}
           <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-lg">
-            {/* <div className="p-6"> */}
-              {/* <h2 className="text-xl font-bold text-gray-900 mb-4">Activity Overview</h2> */}
-              <StreakGraph
-                data={streakData}
-                totalActiveDays={stats.totalActiveDays}
-                maxStreak={stats.maxStreak}
-              />
-            {/* </div> */}
+            <StreakGraph
+              data={streakData}
+              totalActiveDays={stats.totalActiveDays}
+              maxStreak={stats.maxStreak}
+            />
           </Card>
         </div>
       </Container>
