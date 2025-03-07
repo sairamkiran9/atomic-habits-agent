@@ -9,3 +9,4 @@ SQLAlchemy>=2.0.25
 aiosqlite>=0.19.0
 python-dotenv>=1.0.0
 email-validator>=2.1.0.post1
+alembic>=1.13.1

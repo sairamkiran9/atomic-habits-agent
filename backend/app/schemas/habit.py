@@ -38,6 +38,7 @@ class HabitUpdate(HabitBase):
     reminder_time: Optional[str] = None
     completed: Optional[bool] = None
     is_archived: Optional[bool] = None
+    last_completed: Optional[datetime] = None
 
 class HabitInDB(HabitBase):
     id: int
@@ -47,9 +48,14 @@ class HabitInDB(HabitBase):
     streak: int = 0
     completed: bool = False
     is_archived: bool = False
+    last_completed: Optional[datetime] = None
 
     class Config:
         from_attributes = True
 
 class HabitResponse(HabitInDB):
     pass
+
+class ResetResponse(BaseModel):
+    reset_count: int
+    message: str

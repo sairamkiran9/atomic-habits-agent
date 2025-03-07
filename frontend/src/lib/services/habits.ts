@@ -27,6 +27,7 @@ export interface Habit {
   category: HabitCategory;
   reminder_time: string | null;
   is_archived: boolean;
+  last_completed: string | null;
 }
 
 export interface CreateHabitData {
@@ -64,6 +65,10 @@ export class HabitsService {
 
   static async getHabits(): Promise<Habit[]> {
     try {
+      // First, check and reset habits if needed
+      await this.checkAndResetHabits();
+      
+      // Then fetch the updated habits
       const response = await fetch(`${API_URL}/habits`, {
         headers: this.getHeaders()
       });
@@ -72,6 +77,22 @@ export class HabitsService {
       throw error instanceof Error 
         ? error 
         : new Error('An unknown error occurred while fetching habits');
+    }
+  }
+
+  static async checkAndResetHabits(): Promise<void> {
+    try {
+      const response = await fetch(`${API_URL}/habits/reset`, {
+        method: 'POST',
+        headers: this.getHeaders()
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to reset habits');
+      }
+    } catch (error) {
+      console.error('Error resetting habits:', error);
+      // Don't throw error here, as we want to continue loading habits even if reset fails
     }
   }
 
@@ -108,7 +129,10 @@ export class HabitsService {
       const response = await fetch(`${API_URL}/habits/${habitId}`, {
         method: 'PUT',
         headers: this.getHeaders(),
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          ...data,
+          last_completed: data.completed ? new Date().toISOString() : null
+        })
       });
       return this.handleResponse<Habit>(response);
     } catch (error) {

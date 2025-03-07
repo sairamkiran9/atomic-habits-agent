@@ -54,8 +54,7 @@ export default function ProfilePage() {
       const data: StreakData[] = [];
       const today = new Date();
       const oneYearAgo = new Date();
-      // oneYearAgo.setFullYear(today.getFullYear() - 1);
-      oneYearAgo.setMonth(today.getMonth() - 1)
+      oneYearAgo.setMonth(0)
   
       const dailyStreakMap = new Map<string, number[]>();
   

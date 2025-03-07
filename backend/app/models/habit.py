@@ -10,7 +10,8 @@ class Habit(Base):
     Habit Model
     
     Represents a habit that a user wants to track. Each habit has properties that define
-    its frequency, category, and completion status.
+    its frequency, category, and completion status. Includes last_completed timestamp
+    for managing habit resets and streaks.
     """
     __tablename__ = "habits"
 
@@ -26,9 +27,11 @@ class Habit(Base):
     category = Column(String, nullable=False)
     reminder_time = Column(String)
     is_archived = Column(Boolean, default=False)
+    last_completed = Column(DateTime(timezone=True), nullable=True)
     
     # Foreign key to user
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     
-    # Relationship with User model
+    # Relationships
     user = relationship("User", back_populates="habits")
+    logs = relationship("HabitLog", back_populates="habit", cascade="all, delete-orphan")

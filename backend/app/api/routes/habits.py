@@ -2,7 +2,8 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+import pytz
 
 from app.db.session import get_session
 from app.core.auth import get_current_user
@@ -14,10 +15,78 @@ from app.schemas.habit import (
     HabitResponse,
     HabitUpdate,
     HabitCategory,
-    HabitFrequency
+    HabitFrequency,
+    ResetResponse
 )
 
 router = APIRouter()
+
+@router.post("/reset", response_model=ResetResponse)
+async def reset_habits(
+    current_user: UserResponse = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session)
+):
+    """
+    Reset habits based on their frequency and last completion time.
+    Daily habits reset every day, weekly habits reset every week,
+    and monthly habits reset every month.
+    """
+    now = datetime.now(timezone.utc)
+    reset_count = 0
+    
+    # Get all active habits for the user
+    result = await db.execute(
+        select(Habit).where(
+            Habit.user_id == current_user.id,
+            Habit.is_archived == False
+        )
+    )
+    habits = result.scalars().all()
+    
+    for habit in habits:
+        should_reset = False
+        last_completed = habit.last_completed or habit.created_at
+        
+        # Convert to UTC for consistent comparison
+        if last_completed.tzinfo is None:
+            last_completed = last_completed.replace(tzinfo=timezone.utc)
+        
+        # Check if habit needs to be reset based on frequency
+        if habit.frequency == "daily":
+            # Reset if last completion was not today
+            should_reset = last_completed.date() < now.date()
+            
+        elif habit.frequency == "weekly":
+            # Reset if last completion was in a different week
+            week_start = now - timedelta(days=now.weekday())
+            should_reset = last_completed.date() < week_start.date()
+            
+        elif habit.frequency == "monthly":
+            # Reset if last completion was in a different month
+            should_reset = (
+                last_completed.year != now.year or 
+                last_completed.month != now.month
+            )
+        
+        if should_reset and habit.completed:
+            habit.completed = False
+            reset_count += 1
+            
+            # Only reset streak if they missed the last period
+            time_diff = now - last_completed
+            if (habit.frequency == "daily" and time_diff.days > 1) or \
+               (habit.frequency == "weekly" and time_diff.days > 7) or \
+               (habit.frequency == "monthly" and time_diff.days > 31):
+                if habit.streak > 0:
+                    habit.streak = 0
+    
+    if reset_count > 0:
+        await db.commit()
+    
+    return ResetResponse(
+        reset_count=reset_count,
+        message=f"Reset {reset_count} habits"
+    )
 
 @router.get("", response_model=List[HabitResponse])
 async def list_habits(
@@ -32,15 +101,10 @@ async def list_habits(
 ):
     """
     Retrieve habits for the current user with optional filtering.
-    
-    Parameters:
-    - skip: Number of habits to skip (pagination)
-    - limit: Maximum number of habits to return
-    - include_archived: Whether to include archived habits
-    - category: Filter by habit category
-    - frequency: Filter by habit frequency
-    - completed: Filter by completion status
     """
+    # First reset habits if needed
+    await reset_habits(current_user, db)
+    
     conditions = [Habit.user_id == current_user.id]
     
     if not include_archived:
@@ -73,15 +137,6 @@ async def create_habit(
 ):
     """
     Create a new habit for the current user.
-    
-    The habit requires:
-    - title: String (1-100 characters)
-    - description: String (1-500 characters)
-    - frequency: daily/weekly/monthly
-    - category: Mindfulness/Learning/Productivity/Health/Fitness/Career/Social/Other
-    Optional fields:
-    - time_of_day: String
-    - reminder_time: String (time format)
     """
     db_habit = Habit(
         user_id=current_user.id,
@@ -128,16 +183,6 @@ async def update_habit(
 ):
     """
     Update a specific habit by ID.
-    
-    All fields are optional:
-    - title: String (1-100 characters)
-    - description: String (1-500 characters)
-    - frequency: daily/weekly/monthly
-    - category: Mindfulness/Learning/Productivity/Health/Fitness/Career/Social/Other
-    - time_of_day: String
-    - reminder_time: String
-    - completed: Boolean
-    - is_archived: Boolean
     """
     result = await db.execute(
         select(Habit).where(
@@ -153,15 +198,21 @@ async def update_habit(
     # Update habit attributes
     update_data = habit_update.model_dump(exclude_unset=True)
     
-    # If completion status changes, handle streak
-    if 'completed' in update_data and update_data['completed'] != habit.completed:
+    # Handle completion and last_completed
+    if 'completed' in update_data:
         if update_data['completed']:
+            habit.completed = True
+            habit.last_completed = datetime.now(timezone.utc)
             habit.streak += 1
         else:
+            habit.completed = False
+            # Don't reset last_completed when unchecking to preserve streak calculation
             habit.streak = max(0, habit.streak - 1)
     
+    # Update other fields
     for key, value in update_data.items():
-        setattr(habit, key, value)
+        if key != 'completed':  # Skip completed as it's handled above
+            setattr(habit, key, value)
     
     await db.commit()
     await db.refresh(habit)
