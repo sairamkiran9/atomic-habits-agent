@@ -46,6 +46,13 @@ export interface ApiError {
   status: number;
 }
 
+export interface ArchiveResponse {
+  id: number;
+  title: string;
+  is_archived: boolean;
+  message: string;
+}
+
 export class HabitsService {
   private static getHeaders(): HeadersInit {
     const token = AuthService.getToken();
@@ -68,8 +75,9 @@ export class HabitsService {
       // First, check and reset habits if needed
       await this.checkAndResetHabits();
       
-      // Then fetch the updated habits
-      const response = await fetch(`${API_URL}/habits`, {
+      // Then fetch the updated habits - always include archived habits
+      // We'll filter them in the UI based on the user's selection
+      const response = await fetch(`${API_URL}/habits?include_archived=true&limit=100`, {
         headers: this.getHeaders()
       });
       return this.handleResponse<Habit[]>(response);
@@ -139,6 +147,23 @@ export class HabitsService {
       throw error instanceof Error 
         ? error 
         : new Error(`An unknown error occurred while updating habit ${habitId}`);
+    }
+  }
+
+  static async toggleArchiveHabit(habitId: number): Promise<Habit> {
+    try {
+      const response = await fetch(`${API_URL}/habits/${habitId}/archive`, {
+        method: 'POST',
+        headers: this.getHeaders()
+      });
+      const result = await this.handleResponse<ArchiveResponse>(response);
+      
+      // Get the updated habit with all data
+      return this.getHabit(habitId);
+    } catch (error) {
+      throw error instanceof Error
+        ? error
+        : new Error(`An unknown error occurred while archiving/unarchiving habit ${habitId}`);
     }
   }
 

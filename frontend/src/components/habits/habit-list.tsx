@@ -6,8 +6,32 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { HabitForm } from './habit-form';
-import { Archive, CheckCircle2, Circle, Clock, Edit2, Flame, Trash2, Target } from 'lucide-react';
+import { Archive, CheckCircle2, Circle, Clock, Edit2, Flame, Target, ArchiveRestore, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+interface DeleteConfirmationProps {
+  habitTitle: string;
+  onCancel: () => void;
+  onConfirm: () => void;
+}
+
+// Simple inline delete confirmation component
+function DeleteConfirmation({ habitTitle, onCancel, onConfirm }: DeleteConfirmationProps) {
+  return (
+    <Card className="absolute bottom-4 right-4 p-4 bg-destructive/10 border-destructive border shadow-lg z-50 max-w-md">
+      <CardHeader className="p-2">
+        <CardTitle className="text-base">Delete Habit</CardTitle>
+        <CardDescription>
+          Are you sure you want to delete "{habitTitle}"? This cannot be undone.
+        </CardDescription>
+      </CardHeader>
+      <CardFooter className="p-2 pt-0 flex justify-end gap-2">
+        <Button variant="outline" size="sm" onClick={onCancel}>Cancel</Button>
+        <Button variant="destructive" size="sm" onClick={onConfirm}>Delete</Button>
+      </CardFooter>
+    </Card>
+  );
+}
 
 interface HabitListProps {
   habits: Habit[];
@@ -16,6 +40,7 @@ interface HabitListProps {
   onHabitDelete: (id: number) => void;
   onArchiveHabit: (id: number) => void;
   showArchiveButton?: boolean;
+  isArchivedView?: boolean;
 }
 
 export function HabitList({
@@ -24,8 +49,12 @@ export function HabitList({
   onHabitUpdate,
   onHabitDelete,
   onArchiveHabit,
-  showArchiveButton = true
+  showArchiveButton = true,
+  isArchivedView = false
 }: HabitListProps) {
+  // Track which habit is being deleted (if any)
+  const [habitToDelete, setHabitToDelete] = useState<number | null>(null);
+
   const getFrequencyColor = (frequency: string) => {
     switch (frequency.toLowerCase()) {
       case 'daily':
@@ -51,8 +80,11 @@ export function HabitList({
     });
   };
 
+  // Get the habit object for the habit being deleted
+  const habitBeingDeleted = habits.find(h => h.id === habitToDelete);
+
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 relative">
       {habits.map((habit) => (
         <Card 
           key={habit.id} 
@@ -137,20 +169,22 @@ export function HabitList({
                     </Button>
                   }
                 />
-                {showArchiveButton && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onArchiveHabit(habit.id)}
-                    className="text-gray-500 hover:text-gray-900"
-                  >
-                    <Archive className="h-4 w-4" />
-                  </Button>
-                )}
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => onHabitDelete(habit.id)}
+                  onClick={() => onArchiveHabit(habit.id)}
+                  className="text-gray-500 hover:text-gray-900"
+                >
+                  {isArchivedView ? (
+                    <ArchiveRestore className="h-4 w-4" />
+                  ) : (
+                    <Archive className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setHabitToDelete(habit.id)}
                   className="text-red-500 hover:text-red-700 hover:bg-red-50"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -160,6 +194,18 @@ export function HabitList({
           </CardFooter>
         </Card>
       ))}
+
+      {/* Show delete confirmation if a habit is selected for deletion */}
+      {habitToDelete !== null && habitBeingDeleted && (
+        <DeleteConfirmation
+          habitTitle={habitBeingDeleted.title}
+          onCancel={() => setHabitToDelete(null)}
+          onConfirm={() => {
+            onHabitDelete(habitToDelete);
+            setHabitToDelete(null);
+          }}
+        />
+      )}
     </div>
   );
 }

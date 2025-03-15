@@ -59,3 +59,9 @@ class HabitResponse(HabitInDB):
 class ResetResponse(BaseModel):
     reset_count: int
     message: str
+
+class ArchiveResponse(BaseModel):
+    id: int
+    title: str
+    is_archived: bool
+    message: str

@@ -57,7 +57,11 @@ export function Sidebar({
       )}
     >
       <div className="p-4 flex justify-between items-center">
-        {!isCollapsed && <h2 className="font-semibold">Categories</h2>}
+        {!isCollapsed && (
+          <h2 className="font-semibold">
+            {showArchived ? "Archived Habits" : "Categories"}
+          </h2>
+        )}
         <Button
           variant="ghost"
           size="sm"
@@ -79,9 +83,12 @@ export function Sidebar({
               variant={selectedCategory === category ? "secondary" : "ghost"}
               className={cn(
                 "w-full justify-start",
-                isCollapsed && "justify-center"
+                isCollapsed && "justify-center",
+                // Dim the categories with 0 count
+                categoryCount[category] === 0 && "opacity-50"
               )}
               onClick={() => onSelectCategory(category === 'All' ? null : category)}
+              disabled={categoryCount[category] === 0}
             >
               {icon}
               {!isCollapsed && (
@@ -100,14 +107,15 @@ export function Sidebar({
             variant={showArchived ? "secondary" : "ghost"}
             className={cn(
               "w-full justify-start",
-              isCollapsed && "justify-center"
+              isCollapsed && "justify-center",
+              showArchived && "bg-purple-100 hover:bg-purple-200 text-purple-800"
             )}
             onClick={onToggleArchived}
           >
-            <Archive className="h-4 w-4" />
+            <Archive className={cn("h-4 w-4", showArchived && "text-purple-800")} />
             {!isCollapsed && (
               <>
-                <span className="ml-2">Archived</span>
+                <span className="ml-2">{showArchived ? "Back to Active" : "Archived"}</span>
                 {categoryCount['Archived'] > 0 && (
                   <span className="ml-auto text-xs font-medium">
                     {categoryCount['Archived']}

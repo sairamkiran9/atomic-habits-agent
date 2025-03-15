@@ -54,46 +54,64 @@ export default function ProfilePage() {
       const data: StreakData[] = [];
       const today = new Date();
       const oneYearAgo = new Date();
-      oneYearAgo.setMonth(0)
+      oneYearAgo.setFullYear(today.getFullYear() - 1);
+      oneYearAgo.setDate(1);
+      oneYearAgo.setMonth(0);
   
-      const dailyStreakMap = new Map<string, number[]>();
+      const dailyCompletionMap = new Map<string, { completed: number; total: number }>();
   
       // Initialize the map with dates for the past year
       for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
         const dateStr = d.toISOString().split('T')[0];
-        dailyStreakMap.set(dateStr, []);
+        dailyCompletionMap.set(dateStr, { completed: 0, total: 0 });
       }
   
-      // Populate the map with habit streaks
+      // Track habit completion across days
       habits.forEach(habit => {
+        // Skip archived habits for activity tracking
+        if (habit.is_archived) return;
+
         const habitCreatedDate = new Date(habit.created_at);
-        let currentDate = new Date(Math.max(habitCreatedDate.getTime(), oneYearAgo.getTime()));
-  
-        while (currentDate <= today) {
+        const startDate = new Date(Math.max(habitCreatedDate.getTime(), oneYearAgo.getTime()));
+        
+        // If this habit has a last_completed date, use it for activity tracking
+        if (habit.last_completed) {
+          const completionDate = new Date(habit.last_completed);
+          const dateStr = completionDate.toISOString().split('T')[0];
+          const dayData = dailyCompletionMap.get(dateStr) || { completed: 0, total: 0 };
+          
+          if (habit.completed) {
+            dayData.completed += 1;
+          }
+          dayData.total += 1;
+          dailyCompletionMap.set(dateStr, dayData);
+        }
+        
+        // Count each habit for each day since it was created
+        for (let currentDate = new Date(startDate); currentDate <= today; currentDate.setDate(currentDate.getDate() + 1)) {
           const dateStr = currentDate.toISOString().split('T')[0];
-          const streaksForDay = dailyStreakMap.get(dateStr) || [];
-          streaksForDay.push(habit.streak || 0);
-          dailyStreakMap.set(dateStr, streaksForDay);
-          currentDate.setDate(currentDate.getDate() + 1);
+          const dayData = dailyCompletionMap.get(dateStr) || { completed: 0, total: 0 };
+          
+          // Only increment total if we haven't counted this habit specifically for this day
+          if (!habit.last_completed || new Date(habit.last_completed).toISOString().split('T')[0] !== dateStr) {
+            dayData.total += 1;
+          }
+          
+          dailyCompletionMap.set(dateStr, dayData);
         }
       });
   
-      // Calculate total streaks per day and format data
+      // Calculate completion percentage per day
       for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
         const dateStr = d.toISOString().split('T')[0];
-        const streaksForDay = dailyStreakMap.get(dateStr) || [];
+        const dayData = dailyCompletionMap.get(dateStr) || { completed: 0, total: 0 };
         
-        // Sum up all streaks for the day
-        const totalStreak = streaksForDay.reduce(
-          (sum: number, streak: number): number => sum + streak, 
-          0
-        );
-
-        const avgStreak = streaksForDay.length > 0 ? totalStreak / streaksForDay.length : 0;
+        // Calculate completion percentage (0 to 1 range)
+        const completionRate = dayData.total > 0 ? dayData.completed / dayData.total : 0;
   
         data.push({
           date: dateStr,
-          count: avgStreak
+          count: completionRate
         });
       }
       return data;

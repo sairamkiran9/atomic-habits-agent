@@ -1,5 +1,5 @@
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 from datetime import datetime, timedelta, timezone
@@ -16,7 +16,8 @@ from app.schemas.habit import (
     HabitUpdate,
     HabitCategory,
     HabitFrequency,
-    ResetResponse
+    ResetResponse,
+    ArchiveResponse
 )
 
 router = APIRouter()
@@ -218,6 +219,39 @@ async def update_habit(
     await db.refresh(habit)
     
     return habit
+
+@router.post("/{habit_id}/archive", response_model=ArchiveResponse)
+async def toggle_archive_habit(
+    habit_id: int,
+    current_user: UserResponse = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session)
+):
+    """
+    Toggle the archive status of a habit (archive or unarchive).
+    """
+    result = await db.execute(
+        select(Habit).where(
+            Habit.id == habit_id,
+            Habit.user_id == current_user.id
+        )
+    )
+    habit = result.scalar_one_or_none()
+    
+    if not habit:
+        raise HTTPException(status_code=404, detail="Habit not found")
+    
+    # Toggle archive status
+    habit.is_archived = not habit.is_archived
+    action = "archived" if habit.is_archived else "unarchived"
+    
+    await db.commit()
+    
+    return ArchiveResponse(
+        id=habit.id,
+        title=habit.title,
+        is_archived=habit.is_archived,
+        message=f"Habit '{habit.title}' has been {action}"
+    )
 
 @router.delete("/{habit_id}", status_code=204)
 async def delete_habit(
