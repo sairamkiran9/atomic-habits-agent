@@ -6,7 +6,7 @@ import { HabitList } from '@/components/habits/habit-list';
 import { Sidebar } from '@/components/habits/sidebar';
 import { HabitForm } from '@/components/habits/habit-form';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Archive } from 'lucide-react';
 import { HabitsService } from '@/lib/services/habits';
 import { useRouter } from 'next/navigation';
 import { AuthService } from '@/lib/services/auth';
@@ -48,6 +48,15 @@ export default function HabitsPage() {
 
     checkAuthAndFetchHabits();
   }, [router]);
+
+  // Function to handle toggling between active and archived habits view
+  const handleToggleArchived = async () => {
+    // Toggle the showArchived state
+    setShowArchived(!showArchived);
+    
+    // Refetch habits to ensure we have the latest data
+    await fetchHabits();
+  };
 
   // Data fetching
   const fetchHabits = async () => {
@@ -93,16 +102,24 @@ export default function HabitsPage() {
     };
 
     habits.forEach(habit => {
-      if (!habit.is_archived) {
-        counts[habit.category]++;
-        counts.All++;
-      } else {
+      if (habit.is_archived) {
         counts.Archived++;
+        // Only count categories for archived items when in archived view
+        if (showArchived) {
+          counts[habit.category]++;
+          counts.All++;
+        }
+      } else {
+        // Only count categories for unarchived items when not in archived view
+        if (!showArchived) {
+          counts[habit.category]++;
+          counts.All++;
+        }
       }
     });
 
     return counts;
-  }, [habits]);
+  }, [habits, showArchived]);
 
   // Event handlers
   const handleAddHabit = async (data: CreateHabitData) => {
@@ -162,18 +179,19 @@ export default function HabitsPage() {
   const handleArchiveHabit = async (id: number) => {
     try {
       setError(null);
-      const habit = habits.find(h => h.id === id);
-      if (!habit) return;
-
-      const updatedHabit = await HabitsService.updateHabit(id, {
-        is_archived: !habit.is_archived
-      });
-
+      const updatedHabit = await HabitsService.toggleArchiveHabit(id);
+      
+      // Update state to reflect the change
       setHabits(prev => prev.map(h => h.id === id ? updatedHabit : h));
+      
+      // Refetch habits if needed to ensure we have the most up-to-date data
+      if (showArchived) {
+        await fetchHabits();
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      console.error('Error archiving habit:', errorMessage);
-      setError('Failed to archive habit. Please try again.');
+      console.error('Error archiving/unarchiving habit:', errorMessage);
+      setError('Failed to archive/unarchive habit. Please try again.');
     }
   };
 
@@ -194,7 +212,7 @@ export default function HabitsPage() {
         selectedCategory={selectedCategory}
         showArchived={showArchived}
         onSelectCategory={setSelectedCategory}
-        onToggleArchived={() => setShowArchived(!showArchived)}
+        onToggleArchived={handleToggleArchived}
         categoryCount={categoryCount}
       />
       <main className="flex-1 overflow-y-auto">
@@ -214,7 +232,7 @@ export default function HabitsPage() {
                 </h1>
                 <p className="text-gray-300 mt-2">
                   {showArchived 
-                    ? 'View and manage your archived habits'
+                    ? 'View, restore, or permanently delete your archived habits'
                     : 'Track and manage your daily habits'}
                 </p>
               </div>
@@ -239,8 +257,17 @@ export default function HabitsPage() {
               onHabitUpdate={handleHabitUpdate}
               onHabitDelete={handleHabitDelete}
               onArchiveHabit={handleArchiveHabit}
-              showArchiveButton={!showArchived}
+              showArchiveButton={true}
+              isArchivedView={showArchived}
             />
+
+            {showArchived && filteredHabits.length === 0 && (
+              <div className="text-center py-16 bg-gray-800/20 rounded-lg">
+                <Archive className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-xl font-medium text-white mb-2">No archived habits</h3>
+                <p className="text-gray-400">When you archive habits, they'll appear here.</p>
+              </div>
+            )}
           </div>
         </Container>
       </main>
