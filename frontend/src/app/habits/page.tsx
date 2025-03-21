@@ -194,6 +194,16 @@ export default function HabitsPage() {
     }
   };
 
+  // Custom handler to fix type mismatch
+  const handleSelectCategory = (category: string | null) => {
+    // Convert string to HabitCategory if needed
+    if (category === null) {
+      setSelectedCategory(null);
+    } else {
+      setSelectedCategory(category as HabitCategory);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800">
@@ -210,7 +220,7 @@ export default function HabitsPage() {
       <Sidebar
         selectedCategory={selectedCategory}
         showArchived={showArchived}
-        onSelectCategory={setSelectedCategory}
+        onSelectCategory={handleSelectCategory}
         onToggleArchived={handleToggleArchived}
         categoryCount={categoryCount}
       />

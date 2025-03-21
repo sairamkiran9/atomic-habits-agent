@@ -123,14 +123,15 @@ export class MockHabitsService {
       title: data.title,
       description: data.description,
       frequency: data.frequency,
-      time_of_day: data.time_of_day || '',
+      time_of_day: data.time_of_day || null,
       created_at: now,
       updated_at: now,
       streak: 0,
       completed: false,
       category: data.category,
-      reminder_time: data.reminder_time || '',
-      is_archived: false
+      reminder_time: data.reminder_time || null,
+      is_archived: false,
+      last_completed: null
     };
     
     const updatedHabits = [...habits, newHabit];
@@ -152,12 +153,14 @@ export class MockHabitsService {
     
     // Handle streak logic
     let streak = oldHabit.streak;
+    let lastCompleted = oldHabit.last_completed;
     
     if ('completed' in data) {
       if (data.completed && !oldHabit.completed) {
         // Mark as completed
         streak += 1;
-        setLastCompletedDate(habitId, now.toISOString());
+        lastCompleted = now.toISOString();
+        setLastCompletedDate(habitId, lastCompleted);
       } else if (!data.completed && oldHabit.completed) {
         // Mark as uncompleted
         streak = Math.max(0, streak - 1);
@@ -169,6 +172,7 @@ export class MockHabitsService {
       ...oldHabit,
       ...data,
       streak,
+      last_completed: lastCompleted,
       updated_at: now.toISOString()
     };
     

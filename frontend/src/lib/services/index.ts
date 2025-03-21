@@ -20,8 +20,8 @@ const isDemo = () => {
 };
 
 // For server-side rendering, we need dynamic imports
-let authService = AuthService;
-let habitsServiceImpl = HabitsService;
+let authService: typeof AuthService | typeof MockAuthService = AuthService;
+let habitsServiceImpl: typeof HabitsService | typeof MockHabitsService = HabitsService;
 
 // Update services if we're in demo mode (client-side only)
 if (typeof window !== 'undefined' && isDemo()) {

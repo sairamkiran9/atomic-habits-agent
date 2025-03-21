@@ -29,7 +29,8 @@ export const generateMockHabits = (): Habit[] => {
       completed: true,
       category: 'Mindfulness',
       reminder_time: '06:25',
-      is_archived: false
+      is_archived: false,
+      last_completed: now.toISOString()
     },
     {
       id: 2,
@@ -43,7 +44,8 @@ export const generateMockHabits = (): Habit[] => {
       completed: false,
       category: 'Learning',
       reminder_time: '20:55',
-      is_archived: false
+      is_archived: false,
+      last_completed: yesterday.toISOString()
     },
     {
       id: 3,
@@ -57,12 +59,13 @@ export const generateMockHabits = (): Habit[] => {
       completed: true,
       category: 'Fitness',
       reminder_time: '17:15',
-      is_archived: false
+      is_archived: false,
+      last_completed: new Date(now.setDate(now.getDate() - 2)).toISOString()
     },
     {
       id: 4,
       title: 'Gratitude Journaling',
-      description: 'Write down three things you "re grateful for to cultivate positivity and mindfulness.',
+      description: 'Write down three things you are grateful for to cultivate positivity and mindfulness.',
       frequency: 'daily',
       time_of_day: '22:00',
       created_at: new Date(2024, 0, 10).toISOString(),
@@ -71,7 +74,8 @@ export const generateMockHabits = (): Habit[] => {
       completed: false,
       category: 'Mindfulness',
       reminder_time: '21:55',
-      is_archived: false
+      is_archived: false,
+      last_completed: new Date(now.setDate(now.getDate() - 3)).toISOString()
     },
     {
       id: 5,
@@ -85,7 +89,8 @@ export const generateMockHabits = (): Habit[] => {
       completed: true,
       category: 'Productivity',
       reminder_time: '17:45',
-      is_archived: false
+      is_archived: false,
+      last_completed: new Date(now.setDate(now.getDate() - 4)).toISOString()
     },
     {
       id: 6,
@@ -99,7 +104,8 @@ export const generateMockHabits = (): Habit[] => {
       completed: true,
       category: 'Learning',
       reminder_time: '19:25',
-      is_archived: false
+      is_archived: false,
+      last_completed: now.toISOString()
     },
     {
       id: 7,
@@ -113,21 +119,23 @@ export const generateMockHabits = (): Habit[] => {
       completed: true,
       category: 'Career',
       reminder_time: '09:55',
-      is_archived: false
+      is_archived: false,
+      last_completed: new Date(2024, 2, 1).toISOString()
     },
     {
       id: 8,
       title: 'Daily Water Intake',
       description: 'Drink at least 2 liters of water throughout the day for proper hydration.',
       frequency: 'daily',
-      time_of_day: '',
+      time_of_day: null,
       created_at: new Date(2024, 0, 12).toISOString(),
       updated_at: new Date(2024, 1, 10).toISOString(),
       streak: 0,
       completed: false,
       category: 'Health',
-      reminder_time: '',
-      is_archived: true
+      reminder_time: null,
+      is_archived: true,
+      last_completed: new Date(2024, 2, 10).toISOString()
     },
     {
       id: 9,
@@ -141,7 +149,8 @@ export const generateMockHabits = (): Habit[] => {
       completed: false,
       category: 'Social',
       reminder_time: '18:45',
-      is_archived: false
+      is_archived: false,
+      last_completed: new Date(2024, 2, 7).toISOString()
     },
     {
       id: 10,
@@ -155,12 +164,18 @@ export const generateMockHabits = (): Habit[] => {
       completed: true,
       category: 'Mindfulness',
       reminder_time: '19:55',
-      is_archived: false
+      is_archived: false,
+      last_completed: now.toISOString()
     }
   ];
   
   return habits;
 };
+
+// Type for completion dates storage
+interface CompletionDates {
+  [habitId: number]: string;
+}
 
 // Mock storage in localStorage
 const STORAGE_KEYS = {
@@ -188,7 +203,7 @@ export const initializeMockData = (): void => {
   
   if (!localStorage.getItem(STORAGE_KEYS.HABITS_COMPLETED)) {
     // Initialize completion dates storage
-    const completionDates = {};
+    const completionDates: CompletionDates = {};
     const habits = generateMockHabits();
     habits.forEach(habit => {
       if (habit.completed) {
@@ -208,11 +223,11 @@ export const resetMockData = (): void => {
   localStorage.setItem(STORAGE_KEYS.TOKEN, 'demo_mock_jwt_token');
   
   // Reset completion dates
-  const completionDates = {};
+  const completionDates: CompletionDates = {};
   const habits = generateMockHabits();
   habits.forEach(habit => {
-    if (habit.completed) {
-      completionDates[habit.id] = new Date().toISOString();
+    if (habit.completed && habit.last_completed) {
+      completionDates[habit.id] = habit.last_completed;
     }
   });
   localStorage.setItem(STORAGE_KEYS.HABITS_COMPLETED, JSON.stringify(completionDates));
@@ -240,7 +255,7 @@ export const getLastCompletedDate = (habitId: number): string | null => {
   const completionDatesString = localStorage.getItem(STORAGE_KEYS.HABITS_COMPLETED);
   if (!completionDatesString) return null;
   
-  const completionDates = JSON.parse(completionDatesString);
+  const completionDates: CompletionDates = JSON.parse(completionDatesString);
   return completionDates[habitId] || null;
 };
 
@@ -249,7 +264,7 @@ export const setLastCompletedDate = (habitId: number, date: string | null): void
   if (typeof window === 'undefined') return;
   
   const completionDatesString = localStorage.getItem(STORAGE_KEYS.HABITS_COMPLETED);
-  const completionDates = completionDatesString ? JSON.parse(completionDatesString) : {};
+  const completionDates: CompletionDates = completionDatesString ? JSON.parse(completionDatesString) : {};
   
   if (date === null) {
     delete completionDates[habitId];
