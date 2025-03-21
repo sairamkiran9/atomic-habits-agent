@@ -7,9 +7,8 @@ import { Sidebar } from '@/components/habits/sidebar';
 import { HabitForm } from '@/components/habits/habit-form';
 import { Button } from '@/components/ui/button';
 import { Plus, Archive } from 'lucide-react';
-import { HabitsService } from '@/lib/services/habits';
+import { auth, habits as habitsService } from '@/lib/services';
 import { useRouter } from 'next/navigation';
-import { AuthService } from '@/lib/services/auth';
 import type { Habit, CreateHabitData, HabitCategory } from '@/lib/types/habit';
 
 // Type definitions
@@ -39,7 +38,7 @@ export default function HabitsPage() {
   // Authentication check and initial data fetch
   useEffect(() => {
     const checkAuthAndFetchHabits = async () => {
-      if (!AuthService.isAuthenticated()) {
+      if (!auth.isAuthenticated()) {
         router.push('/login');
         return;
       }
@@ -62,7 +61,7 @@ export default function HabitsPage() {
   const fetchHabits = async () => {
     try {
       setError(null);
-      const fetchedHabits = await HabitsService.getHabits();
+      const fetchedHabits = await habitsService.getHabits();
       setHabits(fetchedHabits);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -70,7 +69,7 @@ export default function HabitsPage() {
       setError('Failed to load habits. Please try again.');
       
       if (errorMessage.includes('401')) {
-        AuthService.logout();
+        auth.logout();
         router.push('/login');
       }
     } finally {
@@ -125,7 +124,7 @@ export default function HabitsPage() {
   const handleAddHabit = async (data: CreateHabitData) => {
     try {
       setError(null);
-      const newHabit = await HabitsService.createHabit(data);
+      const newHabit = await habitsService.createHabit(data);
       setHabits(prev => [...prev, newHabit]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -140,7 +139,7 @@ export default function HabitsPage() {
       const habit = habits.find(h => h.id === id);
       if (!habit) return;
 
-      const updatedHabit = await HabitsService.updateHabit(id, {
+      const updatedHabit = await habitsService.updateHabit(id, {
         completed: !habit.completed
       });
 
@@ -155,7 +154,7 @@ export default function HabitsPage() {
   const handleHabitUpdate = async (id: number, data: Partial<Habit>) => {
     try {
       setError(null);
-      const updatedHabit = await HabitsService.updateHabit(id, data);
+      const updatedHabit = await habitsService.updateHabit(id, data);
       setHabits(prev => prev.map(h => h.id === id ? updatedHabit : h));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -167,7 +166,7 @@ export default function HabitsPage() {
   const handleHabitDelete = async (id: number) => {
     try {
       setError(null);
-      await HabitsService.deleteHabit(id);
+      await habitsService.deleteHabit(id);
       setHabits(prev => prev.filter(h => h.id !== id));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -179,7 +178,7 @@ export default function HabitsPage() {
   const handleArchiveHabit = async (id: number) => {
     try {
       setError(null);
-      const updatedHabit = await HabitsService.toggleArchiveHabit(id);
+      const updatedHabit = await habitsService.toggleArchiveHabit(id);
       
       // Update state to reflect the change
       setHabits(prev => prev.map(h => h.id === id ? updatedHabit : h));

@@ -1,8 +1,11 @@
+// src/app/layout.tsx
 import type { Metadata } from 'next'
 import { Inter as InterFont } from 'next/font/google'
 import './globals.css'
-import { ThemeProvider } from '../components/providers/theme-provider'
+import { ThemeProvider } from '@/components/providers/theme-provider'
+import { DemoModeProvider } from '@/components/providers/demo-mode-provider'
 import { NavBar } from '@/components/layout/nav-bar'
+import { DemoBanner } from '@/components/layout/demo-banner'
 
 const inter = InterFont({
   subsets: ['latin'],
@@ -31,10 +34,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <NavBar />
-          <main className="flex-1">
-            {children}
-          </main>
+          <DemoModeProvider>
+            <DemoBanner />
+            <NavBar />
+            <main className="flex-1">
+              {children}
+            </main>
+          </DemoModeProvider>
         </ThemeProvider>
       </body>
     </html>
