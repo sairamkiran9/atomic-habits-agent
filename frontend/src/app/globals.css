@@ -4,66 +4,66 @@
  
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 47.4% 11.2%;
+    --background: 40 33% 98%;
+    --foreground: 30 10% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 47.4% 11.2%;
+    --card-foreground: 30 10% 15%;
  
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 47.4% 11.2%;
+    --popover-foreground: 30 10% 15%;
  
-    /* Changed primary color to a warmer, more engaging purple */
-    --primary: 267 83% 57%;
-    --primary-foreground: 210 40% 98%;
+    /* Amber/orange gradient as primary color */
+    --primary: 30 100% 50%;
+    --primary-foreground: 0 0% 100%;
  
-    --secondary: 260 33% 95%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 35 100% 96%;
+    --secondary-foreground: 30 10% 15%;
  
-    --muted: 260 33% 95%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 35 50% 95%;
+    --muted-foreground: 30 10% 40%;
  
-    --accent: 267 83% 57%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 20 100% 55%;
+    --accent-foreground: 0 0% 100%;
  
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 267 83% 57%;
+    --border: 30 10% 90%;
+    --input: 30 10% 90%;
+    --ring: 30 100% 50%;
  
     --radius: 0.75rem;
   }
  
   .dark {
-    --background: 222.2 47.4% 11.2%;
-    --foreground: 210 40% 98%;
+    --background: 30 15% 10%;
+    --foreground: 40 20% 96%;
  
-    --card: 222.2 47.4% 11.2%;
-    --card-foreground: 210 40% 98%;
+    --card: 30 15% 15%;
+    --card-foreground: 40 20% 96%;
  
-    --popover: 222.2 47.4% 11.2%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 30 15% 15%;
+    --popover-foreground: 40 20% 96%;
  
-    --primary: 267 83% 67%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 30 100% 50%;
+    --primary-foreground: 0 0% 0%;
  
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 30 15% 25%;
+    --secondary-foreground: 40 20% 96%;
  
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 30 15% 25%;
+    --muted-foreground: 40 20% 70%;
  
-    --accent: 267 83% 67%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 20 100% 45%;
+    --accent-foreground: 0 0% 0%;
  
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 40 20% 96%;
  
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 267 83% 67%;
+    --border: 30 15% 25%;
+    --input: 30 15% 25%;
+    --ring: 30 100% 50%;
   }
 }
  
@@ -87,6 +87,22 @@
 
 .btn-outline {
   @apply bg-white text-primary border-2 border-primary hover:bg-primary hover:text-primary-foreground;
+}
+
+/* Gradient text for headings */
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-amber-500;
+}
+
+/* Dot pattern backgrounds */
+.dot-pattern {
+  background-image: radial-gradient(circle, rgba(245, 158, 11, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.dot-pattern-dense {
+  background-image: radial-gradient(circle, rgba(245, 158, 11, 0.15) 1px, transparent 1px);
+  background-size: 12px 12px;
 }
 
 @layer components {
