@@ -3,21 +3,10 @@ import { AuthService } from './auth';
 import { HabitsService } from './habits';
 import { MockAuthService } from './mockAuthService';
 import { MockHabitsService } from './mockHabitsService';
+import config from '../config';
 
-// Determine if we're in demo mode
-const isDemo = () => {
-  // Check if demo mode is enabled via environment variable
-  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
-    return true;
-  }
-  
-  // Check if we're in a browser and demoMode is set in localStorage
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('demoMode') === 'true';
-  }
-  
-  return false;
-};
+// Use the isDemo function from config
+const isDemo = config.isDemo;
 
 // For server-side rendering, we need dynamic imports
 let authService: typeof AuthService | typeof MockAuthService = AuthService;
