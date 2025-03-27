@@ -54,7 +54,7 @@ export function ParticleBackground({ className = '' }: ParticleBackgroundProps) 
         y = Math.random() * canvas.height; // Anywhere on the screen
       }
       
-      const size = Math.random() * 3 + 0.8; // Slightly larger particles
+      const size = Math.random() * 2 + 0.5; // Slightly larger particles
       const speedX = Math.random() * 0.4 - 0.2; // Slightly slower movement
       const speedY = Math.random() * 0.4 - 0.2;
       

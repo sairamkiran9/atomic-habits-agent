@@ -80,10 +80,10 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
   const getColor = (count: number) => {
     if (count === -1) return ''; // Empty cell
     if (count === 0) return 'bg-gray-200'; // No activity
-    if (count < 0.25) return 'bg-green-100'; // Low activity
-    if (count < 0.5) return 'bg-green-300'; // Medium activity
-    if (count < 0.75) return 'bg-green-500'; // High activity
-    return 'bg-green-700'; // Very high activity
+    if (count < 0.25) return 'bg-amber-100'; // Low activity
+    if (count < 0.5) return 'bg-amber-300'; // Medium activity
+    if (count < 0.75) return 'bg-amber-500'; // High activity
+    return 'bg-amber-700'; // Very high activity
   };
 
   // Get activity count for a date
@@ -98,14 +98,14 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
   return (
     <div className="w-full p-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Activity Overview</h2>
+        <h2 className="text-xl font-semibold text-amber-800">Activity Overview</h2>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Select Year:</span>
+          <span className="text-sm text-amber-700">Select Year:</span>
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="px-3 py-1 border border-gray-300 rounded-md text-sm bg-white 
-                     focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="px-3 py-1 border border-amber-300 rounded-md text-sm bg-white 
+                     focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           >
             {availableYears.map((year) => (
               <option key={year} value={year}>
@@ -122,7 +122,7 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
           <div className="w-12" />
           <div className="grid grid-cols-12 gap-4">
             {timelineData && timelineData.map((month, index) => (
-              <div key={index} className="text-sm text-gray-600 font-medium">
+              <div key={index} className="text-sm text-amber-700 font-medium">
                 {month.month}
               </div>
             ))}
@@ -134,7 +134,7 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
           {/* Weekday Labels */}
           <div className="flex flex-col gap-2">
             {weekDays.map((day, index) => (
-              <div key={index} className="text-sm text-gray-600 h-6 flex items-center">
+              <div key={index} className="text-sm text-amber-700 h-6 flex items-center">
                 {day}
               </div>
             ))}
@@ -165,7 +165,7 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
                         >
                           {/* Tooltip */}
                           <div className="invisible group-hover:visible absolute z-20 px-2 py-1 text-xs 
-                                      text-white bg-gray-900 rounded-md -top-8 left-1/2 transform -translate-x-1/2
+                                      text-white bg-amber-800 rounded-md -top-8 left-1/2 transform -translate-x-1/2
                                       whitespace-nowrap shadow-lg">
                             {date ? 
                               `${Math.round(count*100)}% completion on ${date.toLocaleDateString()}` : 
@@ -183,14 +183,14 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
         </div>
 
         {/* Legend */}
-        <div className="flex items-center justify-end space-x-2 text-xs text-gray-600 mt-4">
+        <div className="flex items-center justify-end space-x-2 text-xs text-amber-700 mt-4">
           <span>Less</span>
           <div className="flex gap-2">
             <div className="w-[15px] h-[15px] bg-gray-200 rounded" />
-            <div className="w-[15px] h-[15px] bg-green-100 rounded" />
-            <div className="w-[15px] h-[15px] bg-green-300 rounded" />
-            <div className="w-[15px] h-[15px] bg-green-500 rounded" />
-            <div className="w-[15px] h-[15px] bg-green-700 rounded" />
+            <div className="w-[15px] h-[15px] bg-amber-100 rounded" />
+            <div className="w-[15px] h-[15px] bg-amber-300 rounded" />
+            <div className="w-[15px] h-[15px] bg-amber-500 rounded" />
+            <div className="w-[15px] h-[15px] bg-amber-700 rounded" />
           </div>
           <span>More</span>
         </div>

@@ -13,7 +13,7 @@ export default function HabitsLayout({
 }) {
   return (
     <RouteProtection>
-      <div className="min-h-[calc(80vh-4rem)] bg-gradient-to-br from-purple-50 to-violet-100">
+      <div className="min-h-[calc(80vh-4rem)] bg-gradient-to-br from-amber-10 to-[#f7e8dc]">
         {children}
       </div>
     </RouteProtection>

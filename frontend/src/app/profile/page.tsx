@@ -229,10 +229,10 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-purple-50 to-violet-100">
+      <div className="flex h-full items-center justify-center bg-gradient-to-br from-amber-50 to-[#f7e8dc] dot-pattern-dense">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading your profile...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#b36c33] mx-auto"></div>
+          <p className="mt-4 text-amber-700/80">Loading your profile...</p>
         </div>
       </div>
     );
@@ -243,24 +243,24 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-100">
+    <div className="h-full bg-gradient-to-br from-amber-50 to-[#f7e8dc] dot-pattern-dense">
       <Container>
         <div className="py-8 space-y-8">
           {/* Profile Card */}
-          <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-lg">
+          <Card className="bg-white/80 backdrop-blur-sm border-amber-200/50 shadow-lg rounded-lg overflow-hidden">
             <div className="p-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 rounded-full bg-violet-100 flex items-center justify-center">
-                      <UserIcon size={32} className="text-violet-600" />
+                    <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center">
+                      <UserIcon size={32} className="text-amber-700" />
                     </div>
                     <div>
-                      <h1 className="text-2xl font-bold text-gray-900">
+                      <h1 className="text-2xl font-bold text-amber-900">
                         {user.full_name}
                         {isDemoMode && <span className="ml-2 text-sm font-normal text-amber-600">(Demo User)</span>}
                       </h1>
-                      <div className="flex items-center space-x-2 text-gray-600">
+                      <div className="flex items-center space-x-2 text-amber-700">
                         <Mail size={16} />
                         <span>{user.email}</span>
                       </div>
@@ -268,16 +268,16 @@ export default function ProfilePage() {
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <Award size={16} className="text-violet-500" />
+                    <div className="flex items-center space-x-2 text-amber-700">
+                      <Award size={16} className="text-amber-500" />
                       <span>Current Streak: {stats.currentStreak} days</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <Award size={16} className="text-violet-600" />
+                    <div className="flex items-center space-x-2 text-amber-700">
+                      <Award size={16} className="text-amber-600" />
                       <span>Best Streak: {stats.maxStreak} days</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <Calendar size={16} className="text-violet-500" />
+                    <div className="flex items-center space-x-2 text-amber-700">
+                      <Calendar size={16} className="text-amber-500" />
                       <span>Joined {joinDate}</span>
                     </div>
                   </div>
@@ -285,7 +285,7 @@ export default function ProfilePage() {
                 
                 <Button 
                   variant="outline"
-                  className="mt-4 md:mt-0 text-gray-600 hover:text-gray-900 hover:bg-gray-100 border-gray-200"
+                  className="mt-4 md:mt-0 text-amber-700 hover:text-amber-900 hover:bg-amber-50 border-amber-200"
                   onClick={handleLogout}
                 >
                   <LogOut size={16} className="mr-2" />
@@ -296,7 +296,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Streak Graph */}
-          <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-lg">
+          <Card className="bg-white/80 backdrop-blur-sm border-amber-200/50 shadow-lg rounded-lg overflow-hidden">
             <StreakGraph
               data={streakData}
               totalActiveDays={stats.totalActiveDays}
