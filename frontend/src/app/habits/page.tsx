@@ -206,9 +206,9 @@ export default function HabitsPage() {
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center bg-gradient-to-b from-amber-900 to-amber-800 dot-pattern-dense">
-        <div className="text-center text-white">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400 mx-auto"></div>
+      <div className="flex h-full items-center justify-center bg-amber-50 dot-pattern-dense">
+        <div className="text-center text-amber-700">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto"></div>
           <p className="mt-4">Loading your habits...</p>
         </div>
       </div>
@@ -216,7 +216,7 @@ export default function HabitsPage() {
   }
 
   return (
-    <div className="flex h-full bg-gradient-to-b from-amber-900 to-amber-800 dot-pattern-dense">
+    <div className="flex h-screen bg-amber-50 dot-pattern-dense">
       <Sidebar
         selectedCategory={selectedCategory}
         showArchived={showArchived}
@@ -224,22 +224,22 @@ export default function HabitsPage() {
         onToggleArchived={handleToggleArchived}
         categoryCount={categoryCount}
       />
-      <main className="flex-1 overflow-y-auto">
-        <Container>
-          <div className="py-8">
+      <main className="flex-1 overflow-y-auto pb-6 h-screen">
+        <Container className="h-full">
+          <div className="py-6 space-y-6">
             {error && (
               <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg shadow-sm">
                 {error}
               </div>
             )}
 
-            <div className="flex justify-between items-center mb-8 bg-amber-800/30 p-5 rounded-lg border border-amber-700/30 shadow-md">
+            <div className="flex justify-between items-center px-6 py-5 mb-6 bg-amber-100/90 rounded-lg border border-amber-200 shadow-sm">
               <div>
-                <h1 className="text-3xl font-bold gradient-text bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-amber-300">
+                <h1 className="text-2xl font-bold text-amber-600">
                   {showArchived ? 'Archived Habits' : 'Your Habits'}
                   {selectedCategory && ` - ${selectedCategory}`}
                 </h1>
-                <p className="text-amber-200 mt-2">
+                <p className="text-amber-600/80 mt-1">
                   {showArchived 
                     ? 'View, restore, or permanently delete your archived habits'
                     : 'Track and manage your daily habits'}
@@ -251,7 +251,7 @@ export default function HabitsPage() {
                   onSubmit={handleAddHabit}
                   defaultCategory={selectedCategory || undefined}
                   trigger={
-                    <Button className="bg-amber-500 hover:bg-amber-600 text-white border-2 border-amber-400/20 shadow-lg">
+                    <Button className="bg-amber-500 hover:bg-amber-600 text-white">
                       <Plus className="h-4 w-4 mr-2" />
                       Add Habit
                     </Button>
@@ -260,43 +260,43 @@ export default function HabitsPage() {
               )}
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 relative pb-8">
-              {filteredHabits.length === 0 && !showArchived && (
-                <div className="col-span-3 text-center py-16 bg-amber-800/20 border border-amber-700/30 rounded-lg">
-                  <div className="h-12 w-12 mx-auto text-amber-400 mb-4 opacity-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-medium text-amber-200 mb-2">No habits yet</h3>
-                  <p className="text-amber-300/70 mb-6">Create your first habit to start tracking your progress</p>
-                  <HabitForm
-                    onSubmit={handleAddHabit}
-                    trigger={
-                      <Button className="bg-amber-500 hover:bg-amber-600 text-white border-2 border-amber-400/20 shadow-md">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Create your first habit
-                      </Button>
-                    }
-                  />
+            {/* Render the conditional empty state or the habit list */}
+            {filteredHabits.length === 0 && !showArchived ? (
+              <div className="text-center py-16 bg-white border border-amber-200 rounded-lg">
+                <div className="h-12 w-12 mx-auto text-amber-400 mb-4 opacity-70">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                 </div>
-              )}
+                <h3 className="text-xl font-medium text-amber-700 mb-2">No habits yet</h3>
+                <p className="text-amber-600/70 mb-6">Create your first habit to start tracking your progress</p>
+                <HabitForm
+                  onSubmit={handleAddHabit}
+                  trigger={
+                    <Button className="bg-amber-500 hover:bg-amber-600 text-white">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create your first habit
+                    </Button>
+                  }
+                />
+              </div>
+            ) : (
               <HabitList
-              habits={filteredHabits}
-              onHabitComplete={handleHabitComplete}
-              onHabitUpdate={handleHabitUpdate}
-              onHabitDelete={handleHabitDelete}
-              onArchiveHabit={handleArchiveHabit}
-              showArchiveButton={true}
-              isArchivedView={showArchived}
-            />
-            </div>
+                habits={filteredHabits}
+                onHabitComplete={handleHabitComplete}
+                onHabitUpdate={handleHabitUpdate}
+                onHabitDelete={handleHabitDelete}
+                onArchiveHabit={handleArchiveHabit}
+                showArchiveButton={true}
+                isArchivedView={showArchived}
+              />
+            )}
 
             {showArchived && filteredHabits.length === 0 && (
-              <div className="text-center py-16 bg-amber-800/20 border border-amber-700/30 rounded-lg">
+              <div className="text-center py-16 bg-white border border-amber-200 rounded-lg">
                 <Archive className="h-12 w-12 mx-auto text-amber-400 mb-4" />
-                <h3 className="text-xl font-medium text-amber-200 mb-2">No archived habits</h3>
-                <p className="text-amber-300/70">When you archive habits, they'll appear here.</p>
+                <h3 className="text-xl font-medium text-amber-700 mb-2">No archived habits</h3>
+                <p className="text-amber-600/70">When you archive habits, they'll appear here.</p>
               </div>
             )}
           </div>

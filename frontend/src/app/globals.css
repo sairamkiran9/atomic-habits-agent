@@ -75,10 +75,10 @@
     @apply bg-background text-foreground min-h-screen;
   }
   html, body {
-    @apply h-full;
+    @apply h-screen;
   }
   #__next, main {
-    @apply h-full flex-1;
+    @apply h-screen flex-1;
   }
 }
 

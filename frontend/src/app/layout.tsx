@@ -28,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className={inter.variable}>
-      <body className={`font-sans antialiased min-h-screen flex flex-col dot-pattern`}>
+      <body className={`font-sans antialiased min-h-screen h-screen flex flex-col dot-pattern`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
