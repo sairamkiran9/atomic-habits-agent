@@ -188,11 +188,11 @@ export default function LoginPage() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-amber-50 dark:bg-amber-950/80 py-6 border-t border-amber-200/50 dark:border-amber-800/30">
+      {/* <footer className="bg-amber-50 dark:bg-amber-950/80 py-6 border-t border-amber-200/50 dark:border-amber-800/30">
         <div className="max-w-7xl mx-auto px-4 text-center text-amber-700/80 dark:text-amber-400/80">
           <p>&copy; {new Date().getFullYear()} Atomic Habits Tracker. All rights reserved.</p>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 }
