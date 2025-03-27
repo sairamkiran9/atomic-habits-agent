@@ -8,12 +8,13 @@ export function DemoBanner() {
   const { isDemoMode, disableDemoMode, resetDemo } = useDemoMode();
   const [dismissed, setDismissed] = useState(false);
   
+  // Don't render anything if not in demo mode or if dismissed
   if (!isDemoMode || dismissed) {
     return null;
   }
   
   return (
-    <div className="bg-amber-500 text-amber-950 px-4 py-2 relative">
+    <div className="bg-[#f5c9a5] text-amber-950 px-4 py-2 relative w-full z-10">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex-1 text-sm md:text-base">
           <span className="font-semibold">Demo Mode</span>: You're using demo data. 

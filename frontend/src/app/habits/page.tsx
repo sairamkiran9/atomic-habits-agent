@@ -206,7 +206,7 @@ export default function HabitsPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gradient-to-b from-amber-900 to-amber-800 dot-pattern-dense">
+      <div className="flex h-full items-center justify-center bg-gradient-to-b from-amber-900 to-amber-800 dot-pattern-dense">
         <div className="text-center text-white">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400 mx-auto"></div>
           <p className="mt-4">Loading your habits...</p>
@@ -216,7 +216,7 @@ export default function HabitsPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gradient-to-b from-amber-900 to-amber-800 dot-pattern-dense">
+    <div className="flex h-full bg-gradient-to-b from-amber-900 to-amber-800 dot-pattern-dense">
       <Sidebar
         selectedCategory={selectedCategory}
         showArchived={showArchived}

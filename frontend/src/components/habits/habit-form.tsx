@@ -78,7 +78,7 @@ export function HabitForm({ initialData, defaultCategory, onSubmit, trigger }: H
   const content = (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
       <div className="space-y-2">
-        <label htmlFor="title" className="text-sm font-medium">
+        <label htmlFor="title" className="text-sm font-medium text-amber-800 dark:text-amber-300">
           Habit Title
         </label>
         <Input
@@ -87,28 +87,28 @@ export function HabitForm({ initialData, defaultCategory, onSubmit, trigger }: H
           placeholder="Enter habit title"
         />
         {errors.title && (
-          <p className="text-sm text-destructive">{errors.title.message}</p>
+          <p className="text-sm text-red-500 dark:text-red-400">{errors.title.message}</p>
         )}
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="description" className="text-sm font-medium">
+        <label htmlFor="description" className="text-sm font-medium text-amber-800 dark:text-amber-300">
           Description
         </label>
         <Textarea
           id="description"
           {...register("description", { required: "Description is required" })}
           placeholder="Enter habit description"
-          className="min-h-[100px]"
+          className="min-h-[80px]"
         />
         {errors.description && (
-          <p className="text-sm text-destructive">{errors.description.message}</p>
+          <p className="text-sm text-red-500 dark:text-red-400">{errors.description.message}</p>
         )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">
+          <label className="text-sm font-medium text-amber-800 dark:text-amber-300">
             Frequency
           </label>
           <Select 
@@ -127,7 +127,7 @@ export function HabitForm({ initialData, defaultCategory, onSubmit, trigger }: H
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">
+          <label className="text-sm font-medium text-amber-800 dark:text-amber-300">
             Category
           </label>
           <Select 
@@ -150,7 +150,7 @@ export function HabitForm({ initialData, defaultCategory, onSubmit, trigger }: H
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label htmlFor="time_of_day" className="text-sm font-medium">
+          <label htmlFor="time_of_day" className="text-sm font-medium text-amber-800 dark:text-amber-300">
             Time of Day
           </label>
           <Input
@@ -161,7 +161,7 @@ export function HabitForm({ initialData, defaultCategory, onSubmit, trigger }: H
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="reminder_time" className="text-sm font-medium">
+          <label htmlFor="reminder_time" className="text-sm font-medium text-amber-800 dark:text-amber-300">
             Reminder Time
           </label>
           <Input
@@ -172,7 +172,7 @@ export function HabitForm({ initialData, defaultCategory, onSubmit, trigger }: H
         </div>
       </div>
 
-      <Button type="submit" className="w-full">
+      <Button type="submit" className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 hover:from-amber-600 hover:to-orange-600 shadow-md hover:shadow-lg transition-all duration-300">
         {initialData ? 'Update Habit' : 'Create Habit'}
       </Button>
     </form>
@@ -184,8 +184,8 @@ export function HabitForm({ initialData, defaultCategory, onSubmit, trigger }: H
         <DialogTrigger asChild>
           {trigger}
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[425px] bg-gradient-to-br from-amber-50/95 to-white dark:from-amber-950/30 dark:to-gray-900/95">
+          <DialogHeader className="border-b border-amber-200/30 dark:border-amber-800/30 pb-4 mb-4">
             <DialogTitle>{initialData ? 'Edit Habit' : 'Create New Habit'}</DialogTitle>
             <DialogDescription>
               {initialData 

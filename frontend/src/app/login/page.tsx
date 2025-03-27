@@ -58,22 +58,22 @@ export default function LoginPage() {
   // Show loading spinner while checking auth state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-violet-100">
+      <div className="h-full flex items-center justify-center bg-gradient-to-br from-amber-50 to-[#f0d9c7] dot-pattern-dense">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#b36c33] mx-auto"></div>
+          <p className="mt-4 text-amber-700/80">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen flex flex-col bg-gradient-to-br from-purple-50 to-violet-100">
+    <div className="h-full flex flex-col bg-gradient-to-br from-amber-50 to-[#f0d9c7] dot-pattern-dense">
       <div className="flex-1 container mx-auto px-4 py-16">
         <div className="max-w-md mx-auto space-y-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
-            <p className="text-gray-600 mt-2">Sign in to your account</p>
+            <h1 className="text-3xl font-bold text-amber-800 dark:text-amber-300">Welcome Back</h1>
+            <p className="text-amber-700/80 dark:text-amber-400/80 mt-2">Sign in to your account</p>
           </div>
 
           {isDemoMode && (
@@ -90,15 +90,15 @@ export default function LoginPage() {
           )}
 
           <form onSubmit={handleSubmit(onSubmit)} 
-                className="space-y-6 bg-white/80 backdrop-blur-sm p-8 rounded-lg shadow-lg">
+                className="space-y-6 bg-white/80 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-amber-200/50 dark:bg-gray-900/80 dark:border-amber-700/30">
             {error && (
-              <div className="p-3 rounded bg-red-50 text-red-500 text-sm">
+              <div className="p-3 rounded-md bg-red-50 border border-red-200 text-red-600 text-sm">
                 {error}
               </div>
             )}
             
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="text-sm font-medium text-amber-800 dark:text-amber-300">
                 Email
               </label>
               <Input
@@ -112,15 +112,15 @@ export default function LoginPage() {
                   },
                 })}
                 placeholder="Enter your email"
-                className="bg-white/90"
+                className="bg-amber-50/40 dark:bg-amber-900/10 border-amber-300 dark:border-amber-700/50 focus-visible:ring-[#b36c33] dark:focus-visible:ring-[#c67c40] placeholder:text-amber-400/70 dark:placeholder:text-amber-500/40"
               />
               {errors.email && (
-                <p className="text-sm text-red-500">{errors.email.message}</p>
+                <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="text-sm font-medium text-amber-800 dark:text-amber-300">
                 Password
               </label>
               <Input
@@ -136,21 +136,21 @@ export default function LoginPage() {
                   })
                 })}
                 placeholder="Enter your password"
-                className="bg-white/90"
+                className="bg-amber-50/40 dark:bg-amber-900/10 border-amber-300 dark:border-amber-700/50 focus-visible:ring-[#b36c33] dark:focus-visible:ring-[#c67c40] placeholder:text-amber-400/70 dark:placeholder:text-amber-500/40"
               />
               {errors.password && (
-                <p className="text-sm text-red-500">{errors.password.message}</p>
+                <p className="text-sm text-red-600 mt-1">{errors.password.message}</p>
               )}
             </div>
 
             <div className="flex items-center justify-between">
-              <label className="flex items-center space-x-2 text-sm text-gray-600">
-                <input type="checkbox" className="rounded border-gray-300" />
+              <label className="flex items-center space-x-2 text-sm text-amber-700/80 dark:text-amber-400/80">
+                <input type="checkbox" className="rounded border-amber-300 dark:border-amber-700" />
                 <span>Remember me</span>
               </label>
               <Link 
                 href="/forgot-password" 
-                className="text-sm text-violet-600 hover:text-violet-700 hover:underline"
+                className="text-sm text-[#b36c33] hover:text-[#a05c28] hover:underline"
               >
                 Forgot password?
               </Link>
@@ -158,16 +158,16 @@ export default function LoginPage() {
 
             <Button 
               type="submit" 
-              className="w-full bg-violet-600 hover:bg-violet-700 text-white"
+              className="w-full bg-[#b36c33] hover:bg-[#a05c28] text-white transition-all duration-200 shadow-sm hover:shadow-md"
             >
               Sign In
             </Button>
 
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-amber-700/80 dark:text-amber-400/80">
               Don't have an account?{" "}
               <Link 
                 href="/register" 
-                className="text-violet-600 hover:text-violet-700 hover:underline"
+                className="text-[#b36c33] hover:text-[#a05c28] hover:underline"
               >
                 Sign up
               </Link>
@@ -178,7 +178,7 @@ export default function LoginPage() {
             <div className="text-center">
               <Link 
                 href="/?demo=true" 
-                className="text-sm text-violet-600 hover:text-violet-700 hover:underline"
+                className="text-sm text-[#b36c33] hover:text-[#a05c28] hover:underline"
               >
                 Want to try a demo without signing up?
               </Link>
@@ -188,11 +188,11 @@ export default function LoginPage() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white py-6">
-        <div className="max-w-7xl mx-auto px-4 text-center text-gray-600">
+      <footer className="bg-amber-50 dark:bg-amber-950/80 py-6 border-t border-amber-200/50 dark:border-amber-800/30">
+        <div className="max-w-7xl mx-auto px-4 text-center text-amber-700/80 dark:text-amber-400/80">
           <p>&copy; {new Date().getFullYear()} Atomic Habits Tracker. All rights reserved.</p>
         </div>
       </footer>
-    </main>
+    </div>
   );
 }

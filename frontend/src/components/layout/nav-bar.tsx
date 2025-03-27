@@ -21,7 +21,7 @@ export function NavBar() {
       <div className="flex h-16 items-center px-4 max-w-7xl mx-auto">
         <div className="flex items-center gap-2 font-semibold">
           <Link href="/" className="text-2xl font-bold">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-500">Atomic Habits</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-[#d58b4b]">Atomic Habits</span>
           </Link>
         </div>
         <nav className="mx-6 flex items-center space-x-4 lg:space-x-6">

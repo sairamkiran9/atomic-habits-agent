@@ -6,11 +6,25 @@ interface ParticleBackgroundProps {
   className?: string;
 }
 
+interface Particle {
+  x: number;
+  y: number;
+  size: number;
+  speedX: number;
+  speedY: number;
+  color: string;
+  update: (canvasWidth: number, canvasHeight: number) => void;
+  draw: (ctx: CanvasRenderingContext2D) => void;
+}
+
 export function ParticleBackground({ className = '' }: ParticleBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   useEffect(() => {
-    const canvas = canvasRef.current || null;
+    // Check if window is available (SSR check)
+    if (typeof window === 'undefined') return;
+    
+    const canvas = canvasRef.current;
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
@@ -18,79 +32,94 @@ export function ParticleBackground({ className = '' }: ParticleBackgroundProps) 
     
     // Set canvas to full width/height
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
     };
     
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     
-    // Particle class
-    class Particle {
-      x: number;
-      y: number;
-      size: number;
-      speedX: number;
-      speedY: number;
-      color: string;
+    // Create particle factory function instead of a class
+    const createParticle = (): Particle => {
+      // Adjust distribution to have more particles near the top of the page
+      const x = Math.random() * canvas.width;
       
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 0.5; // Smaller particles
-        this.speedX = Math.random() * 0.5 - 0.25; // Slower movement
-        this.speedY = Math.random() * 0.5 - 0.25;
-        
-        // Create gradient colors from amber to orange
-        const hue = Math.random() * 30 + 20; // 20-50 range (orange to amber)
-        const saturation = Math.random() * 20 + 80; // 80-100%
-        const lightness = Math.random() * 20 + 50; // 50-70%
-        this.color = `hsla(${hue}, ${saturation}%, ${lightness}%, ${Math.random() * 0.3 + 0.2})`;
+      // Bias towards the top part of the screen for more particles near the header
+      let y;
+      if (Math.random() < 0.6) { // 60% chance to be in the top half
+        y = Math.random() * (canvas.height * 0.5); // Top half of the screen
+      } else {
+        y = Math.random() * canvas.height; // Anywhere on the screen
       }
       
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        
-        // Wrap around edges instead of bouncing
-        if (this.x < 0) this.x = canvas.width;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.y < 0) this.y = canvas.height;
-        if (this.y > canvas.height) this.y = 0;
-      }
+      const size = Math.random() * 3 + 0.8; // Slightly larger particles
+      const speedX = Math.random() * 0.4 - 0.2; // Slightly slower movement
+      const speedY = Math.random() * 0.4 - 0.2;
       
-      draw() {
-        if (!ctx) return;
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
+      // Create gradient colors from amber to orange
+      const hue = Math.random() * 30 + 20; // 20-50 range (orange to amber)
+      const saturation = Math.random() * 20 + 80; // 80-100%
+      const lightness = Math.random() * 20 + 50; // 50-70%
+      const color = `hsla(${hue}, ${saturation}%, ${lightness}%, ${Math.random() * 0.3 + 0.2})`;
+      
+      return {
+        x,
+        y,
+        size,
+        speedX,
+        speedY,
+        color,
+        update(canvasWidth: number, canvasHeight: number) {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          
+          // Wrap around edges instead of bouncing
+          if (this.x < 0) this.x = canvasWidth;
+          if (this.x > canvasWidth) this.x = 0;
+          if (this.y < 0) this.y = canvasHeight;
+          if (this.y > canvasHeight) this.y = 0;
+        },
+        draw(ctx: CanvasRenderingContext2D) {
+          ctx.fillStyle = this.color;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      };
+    };
     
-    // Create particles - more particles but less dense on larger screens
+    // Create particles - more particles and concentrated toward the top
     const particlesArray: Particle[] = [];
-    const particleCount = Math.min(Math.max(window.innerWidth * window.innerHeight / 8000, 100), 200);
+    const baseParticleCount = Math.min(
+      Math.max(Math.floor(window.innerWidth * window.innerHeight / 6000), 150), 
+      350
+    );
     
-    for (let i = 0; i < particleCount; i++) {
-      particlesArray.push(new Particle());
+    for (let i = 0; i < baseParticleCount; i++) {
+      particlesArray.push(createParticle());
     }
     
-    // Animation loop
+    // Animation loop with frame ID for proper cleanup
+    let animationFrameId: number;
+    
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       for (let i = 0; i < particlesArray.length; i++) {
-        particlesArray[i].update();
-        particlesArray[i].draw();
+        particlesArray[i].update(canvas.width, canvas.height);
+        particlesArray[i].draw(ctx);
       }
       
-      requestAnimationFrame(animate);
+      animationFrameId = window.requestAnimationFrame(animate);
     };
     
     animate();
     
+    // Cleanup function
     return () => {
+      window.cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', resizeCanvas);
     };
   }, []);
@@ -98,7 +127,7 @@ export function ParticleBackground({ className = '' }: ParticleBackgroundProps) 
   return (
     <canvas 
       ref={canvasRef} 
-      className={`fixed inset-0 -z-10 opacity-60 ${className}`}
+      className={`fixed inset-0 -z-10 opacity-70 ${className}`}
       aria-hidden="true"
     />
   );

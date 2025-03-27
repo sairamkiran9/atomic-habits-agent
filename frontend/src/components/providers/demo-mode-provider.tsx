@@ -26,6 +26,9 @@ export const DemoModeProvider: React.FC<{children: React.ReactNode}> = ({ childr
   const [isDemoMode, setIsDemoMode] = useState(false);
   
   useEffect(() => {
+    // Only run in browser environment
+    if (typeof window === 'undefined') return;
+
     // Check if demo mode is enabled via environment variable
     const envDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
     
@@ -35,6 +38,9 @@ export const DemoModeProvider: React.FC<{children: React.ReactNode}> = ({ childr
     
     // Check localStorage
     const storedDemoMode = localStorage.getItem('demoMode') === 'true';
+    
+    // Log for debugging
+    console.log('Demo mode check:', { envDemoMode, urlDemoMode, storedDemoMode });
     
     // Set demo mode if any of the conditions are true
     const shouldEnableDemo = envDemoMode || urlDemoMode || storedDemoMode;

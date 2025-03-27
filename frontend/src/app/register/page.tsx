@@ -49,11 +49,11 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-violet-100 px-4">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
+    <div className="h-full flex items-center justify-center bg-gradient-to-br from-amber-50 to-[#f7e8dc] px-4 dot-pattern-dense">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md border border-amber-200/50 dark:bg-gray-900 dark:border-amber-700/30">
         <div className="text-center">
-          <h1 className="text-2xl font-bold">Create your account</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-2xl font-bold text-amber-900 dark:text-amber-300">Create your account</h1>
+          <p className="text-amber-700/80 dark:text-amber-400/80 mt-2">
             Enter your details to start your habit tracking journey.
           </p>
         </div>
@@ -82,7 +82,7 @@ export default function RegisterPage() {
             )}
 
             <div className="space-y-2">
-              <label htmlFor="name" className="text-sm font-medium">
+              <label htmlFor="name" className="text-sm font-medium text-amber-800 dark:text-amber-300">
                 Name
               </label>
               <Input
@@ -97,7 +97,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
+              <label htmlFor="email" className="text-sm font-medium text-amber-800 dark:text-amber-300">
                 Email
               </label>
               <Input
@@ -118,7 +118,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
+              <label htmlFor="password" className="text-sm font-medium text-amber-800 dark:text-amber-300">
                 Password
               </label>
               <Input
@@ -143,7 +143,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="confirmPassword" className="text-sm font-medium">
+              <label htmlFor="confirmPassword" className="text-sm font-medium text-amber-800 dark:text-amber-300">
                 Confirm Password
               </label>
               <Input
@@ -166,9 +166,9 @@ export default function RegisterPage() {
             </Button>
             
             <div className="text-center mt-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-amber-700/80 dark:text-amber-400/80">
                 Already have an account?{" "}
-                <Link href="/login" className="text-primary font-medium hover:underline">
+                <Link href="/login" className="text-[#d58b4b] font-medium hover:underline">
                   Login
                 </Link>
               </p>
@@ -177,8 +177,8 @@ export default function RegisterPage() {
         )}
         
         {!isDemoMode && (
-          <div className="flex flex-col items-center space-y-3 border-t border-gray-200 pt-4 mt-6">
-            <p className="text-sm text-gray-500">Don't want to create an account?</p>
+          <div className="flex flex-col items-center space-y-3 border-t border-amber-200 dark:border-amber-800/30 pt-4 mt-6">
+            <p className="text-sm text-amber-700/70 dark:text-amber-400/70">Don't want to create an account?</p>
             <Button variant="outline" onClick={handleDemoClick}>
               Try Demo Mode
             </Button>

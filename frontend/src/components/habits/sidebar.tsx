@@ -52,13 +52,13 @@ export function Sidebar({
   return (
     <div
       className={cn(
-        "relative flex flex-col border-r bg-white transition-all duration-300",
+        "relative flex flex-col border-r border-amber-200/30 bg-amber-50/90 dark:bg-amber-900/20 transition-all duration-300 backdrop-blur-sm",
         isCollapsed ? "w-16" : "w-64"
       )}
     >
       <div className="p-4 flex justify-between items-center">
         {!isCollapsed && (
-          <h2 className="font-semibold">
+          <h2 className="font-semibold text-amber-900 dark:text-amber-200">
             {showArchived ? "Archived Habits" : "Categories"}
           </h2>
         )}
@@ -85,6 +85,8 @@ export function Sidebar({
                 "w-full justify-start",
                 isCollapsed && "justify-center",
                 // Dim the categories with 0 count
+                selectedCategory === category ? "bg-amber-200/70 text-amber-900 hover:bg-amber-200/80 dark:bg-amber-700/50 dark:text-amber-100 dark:hover:bg-amber-700/70" : 
+                "text-amber-900 hover:bg-amber-100 hover:text-amber-900 dark:text-amber-200 dark:hover:bg-amber-800/50",
                 categoryCount[category] === 0 && "opacity-50"
               )}
               onClick={() => onSelectCategory(category === 'All' ? null : category)}
@@ -108,11 +110,12 @@ export function Sidebar({
             className={cn(
               "w-full justify-start",
               isCollapsed && "justify-center",
-              showArchived && "bg-purple-100 hover:bg-purple-200 text-purple-800"
+              showArchived ? "bg-amber-200/70 text-amber-900 hover:bg-amber-200/80 dark:bg-amber-700/50 dark:text-amber-100 dark:hover:bg-amber-700/70" : 
+              "text-amber-900 hover:bg-amber-100 hover:text-amber-900 dark:text-amber-200 dark:hover:bg-amber-800/50"
             )}
             onClick={onToggleArchived}
           >
-            <Archive className={cn("h-4 w-4", showArchived && "text-purple-800")} />
+            <Archive className={cn("h-4 w-4", showArchived && "text-amber-900 dark:text-amber-300")} />
             {!isCollapsed && (
               <>
                 <span className="ml-2">{showArchived ? "Back to Active" : "Archived"}</span>

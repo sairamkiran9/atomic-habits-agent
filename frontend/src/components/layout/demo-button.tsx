@@ -10,9 +10,9 @@ export function DemoButton() {
   return (
     <Button 
       onClick={enableDemoMode}
-      className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-amber-950"
+      className="flex items-center gap-2 bg-[#524839] hover:from-amber-800 hover:to-amber-700 text-white shadow-md hover:shadow-lg border border-amber-800/20 transition-all duration-200"
     >
-      <PlayCircle className="h-4 w-4" />
+      <PlayCircle className="" /> 
       Try Demo
     </Button>
   );

@@ -36,13 +36,13 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <DemoModeProvider>
-            <ParticleBackground />
+            <ParticleBackground /> 
             <DemoBanner />
             <NavBar />
-            <main className="flex-1">
+            <main className="flex-1 w-full">
               {children}
             </main>
-            <footer className="py-6 border-t border-amber-200/50">
+            <footer className="py-6 border-t border-amber-200">
               <div className="max-w-7xl mx-auto px-4 text-center text-amber-800">
                 <p>&copy; {new Date().getFullYear()} Atomic Habits Tracker. All rights reserved.</p>
                 <p className="mt-2 text-sm">Inspired by James Clear's "Atomic Habits" book.</p>
