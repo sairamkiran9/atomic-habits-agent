@@ -198,31 +198,6 @@ npm run dev
 
 The application will be available at http://localhost:3000.
 
-### GitHub Pages Deployment
-
-The frontend is configured for automatic deployment to GitHub Pages. When changes are pushed to the main branch, GitHub Actions will build and deploy the frontend.
-
-#### Setting up GitHub Pages deployment:
-
-1. Make sure your repository is public on GitHub
-2. In your repository settings, enable GitHub Pages and set the source to "GitHub Actions"
-3. Update the backend URL in `.env.production` to point to your deployed backend
-4. Push changes to the main branch to trigger the deployment
-
-The deployed frontend will be available at `https://yourusername.github.io/atomic-habits-agent/`
-
-#### Demo Mode
-
-For demonstration purposes, the frontend can operate in "demo mode" without a backend:
-
-```javascript
-// Enable demo mode in browser console
-localStorage.setItem('demoMode', 'true');
-// Refresh the page
-```
-
-Or set the environment variable `NEXT_PUBLIC_DEMO_MODE=true` during build.
-
 ## Future Enhancements
 
 - **Analytics Dashboard**: Detailed insights into habit performance over time

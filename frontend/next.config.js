@@ -1,9 +1,5 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'export',
-  basePath: process.env.NODE_ENV === 'production' ? '/atomic-habits-agent' : '',
-  trailingSlash: true,
   images: {
     domains: ['localhost'],
     remotePatterns: [
@@ -12,7 +8,6 @@ const nextConfig = {
         hostname: '**',
       },
     ],
-    unoptimized: true, // Required for static export
   },
   webpack: (config, { dev }) => {
     if (dev) {

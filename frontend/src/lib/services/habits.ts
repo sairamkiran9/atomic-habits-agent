@@ -1,7 +1,6 @@
 import { AuthService } from './auth';
-import config from '../config';
 
-const API_URL = `${config.apiUrl}/api`;
+const API_URL = 'http://localhost:8000/api';
 
 export type HabitFrequency = 'daily' | 'weekly' | 'monthly';
 
