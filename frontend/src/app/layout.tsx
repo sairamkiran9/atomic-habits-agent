@@ -42,7 +42,7 @@ export default function RootLayout({
             <main className="flex-1 w-full">
               {children}
             </main>
-            <footer className="py-6 border-t border-amber-200">
+            <footer className="py-6 bg-white border-t border-amber-200">
               <div className="max-w-7xl mx-auto px-4 text-center text-amber-800">
                 <p>&copy; {new Date().getFullYear()} Atomic Habits Tracker. All rights reserved.</p>
                 <p className="mt-2 text-sm">Inspired by James Clear's "Atomic Habits" book.</p>

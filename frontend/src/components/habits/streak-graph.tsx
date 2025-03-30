@@ -80,10 +80,10 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
   const getColor = (count: number) => {
     if (count === -1) return ''; // Empty cell
     if (count === 0) return 'bg-gray-200'; // No activity
-    if (count < 0.25) return 'bg-amber-100'; // Low activity
-    if (count < 0.5) return 'bg-amber-300'; // Medium activity
-    if (count < 0.75) return 'bg-amber-500'; // High activity
-    return 'bg-amber-700'; // Very high activity
+    if (count < 0.25) return 'bg-green-100'; // Low activity
+    if (count < 0.5) return 'bg-green-300'; // Medium activity
+    if (count < 0.75) return 'bg-green-500'; // High activity
+    return 'bg-green-700'; // Very high activity
   };
 
   // Get activity count for a date

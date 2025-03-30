@@ -58,7 +58,7 @@ export function HabitList({
   const getFrequencyColor = (frequency: string) => {
     switch (frequency.toLowerCase()) {
       case 'daily':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
+        return 'bg-amber-50 text-amber-700 border-amber-500';
       case 'weekly':
         return 'bg-orange-50 text-orange-600 border-orange-200';
       case 'monthly':
@@ -90,7 +90,7 @@ export function HabitList({
           key={habit.id} 
           className={cn(
             "group h-full bg-white overflow-hidden",
-            habit.completed ? "border-l-amber-500 border-l-2 border-t border-r border-b border-amber-200" : "border border-amber-200",
+            habit.completed ? "border-l-amber-500 border-l-4 border-t border-r border-b border-amber-500" : "border border-amber-500",
           )}
         >
           {/* Card Header */}
@@ -124,12 +124,12 @@ export function HabitList({
               <span className="text-amber-600/80">day streak</span>
             </div>
             
-            <div className="mt-4">
+            {/* <div className="mt-4">
               <div className="text-xs text-amber-500/80">
                 Started {formatDate(habit.created_at)}
               </div>
             </div>
-            
+             */}
           </CardContent>
           
           {/* Card Footer */}

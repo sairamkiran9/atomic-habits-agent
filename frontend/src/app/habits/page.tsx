@@ -233,7 +233,7 @@ export default function HabitsPage() {
               </div>
             )}
 
-            <div className="flex justify-between items-center px-6 py-5 mb-6 bg-amber-100/90 rounded-lg border border-amber-200 shadow-sm">
+            <div className="flex justify-between items-center px-6 py-5 mb-6 bg-amber-100/90 rounded-lg border border-amber-600 shadow-sm">
               <div>
                 <h1 className="text-2xl font-bold text-amber-600">
                   {showArchived ? 'Archived Habits' : 'Your Habits'}
@@ -262,7 +262,7 @@ export default function HabitsPage() {
 
             {/* Render the conditional empty state or the habit list */}
             {filteredHabits.length === 0 && !showArchived ? (
-              <div className="text-center py-16 bg-white border border-amber-200 rounded-lg">
+              <div className="text-center py-16 bg-white border border-amber-600 rounded-lg">
                 <div className="h-12 w-12 mx-auto text-amber-400 mb-4 opacity-70">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -293,7 +293,7 @@ export default function HabitsPage() {
             )}
 
             {showArchived && filteredHabits.length === 0 && (
-              <div className="text-center py-16 bg-white border border-amber-200 rounded-lg">
+              <div className="text-center py-16 bg-white border border-amber-600 rounded-lg">
                 <Archive className="h-12 w-12 mx-auto text-amber-400 mb-4" />
                 <h3 className="text-xl font-medium text-amber-700 mb-2">No archived habits</h3>
                 <p className="text-amber-600/70">When you archive habits, they'll appear here.</p>
