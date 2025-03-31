@@ -84,7 +84,7 @@ export function HabitList({
   const habitBeingDeleted = habits.find(h => h.id === habitToDelete);
 
   return (
-    <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 relative auto-rows-fr">
+    <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 relative auto-rows-fr pb-6">
       {habits.map((habit) => (
         <Card 
           key={habit.id} 

@@ -52,11 +52,12 @@ export function Sidebar({
   return (
     <div
       className={cn(
-        "relative z-10 flex flex-col border-r border-amber-200 bg-white transition-all duration-300 h-screen",
+        "relative z-10 border-r border-amber-200 bg-white transition-all duration-300 sidebar",
         isCollapsed ? "w-16" : "w-64"
       )}
     >
-      <div className="p-4 flex justify-between items-center border-b border-amber-100">
+      {/* Header - Fixed at the top */}
+      <div className="p-4 flex justify-between items-center border-b border-amber-100 sticky top-0 bg-white z-10">
         {!isCollapsed && (
           <h2 className="font-medium text-amber-700">
             {showArchived ? "Archived Habits" : "Categories"}
@@ -75,60 +76,64 @@ export function Sidebar({
           )}
         </Button>
       </div>
-      <ScrollArea className="flex-1 px-3 h-full overflow-y-auto">
-        <div className="space-y-2 py-3">
-          {Object.entries(categoryIcons).map(([category, icon]) => (
+      
+      {/* Scrollable content area */}
+      <div className="sidebar-content">
+        <ScrollArea className="h-full">
+          <div className="space-y-2 py-3 px-3">
+            {Object.entries(categoryIcons).map(([category, icon]) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "secondary" : "ghost"}
+                className={cn(
+                  "w-full justify-start",
+                  isCollapsed && "justify-center",
+                  // Dim the categories with 0 count
+                  selectedCategory === category ? "bg-amber-100 text-amber-800 hover:bg-amber-200" : 
+                  "text-amber-700 hover:bg-amber-50",
+                  categoryCount[category] === 0 && "opacity-50"
+                )}
+                onClick={() => onSelectCategory(category === 'All' ? null : category)}
+                disabled={categoryCount[category] === 0}
+              >
+                {icon}
+                {!isCollapsed && (
+                  <>
+                    <span className="ml-2">{category}</span>
+                    {categoryCount[category] > 0 && (
+                      <span className="ml-auto text-xs font-medium">
+                        {categoryCount[category]}
+                      </span>
+                    )}
+                  </>
+                )}
+              </Button>
+            ))}
             <Button
-            key={category}
-            variant={selectedCategory === category ? "secondary" : "ghost"}
-            className={cn(
-            "w-full justify-start",
-            isCollapsed && "justify-center",
-            // Dim the categories with 0 count
-            selectedCategory === category ? "bg-amber-100 text-amber-800 hover:bg-amber-200" : 
-            "text-amber-700 hover:bg-amber-50",
-            categoryCount[category] === 0 && "opacity-50"
-            )}
-              onClick={() => onSelectCategory(category === 'All' ? null : category)}
-              disabled={categoryCount[category] === 0}
+              variant={showArchived ? "secondary" : "ghost"}
+              className={cn(
+                "w-full justify-start",
+                isCollapsed && "justify-center",
+                showArchived ? "bg-amber-100 text-amber-800 hover:bg-amber-200" : 
+                "text-amber-700 hover:bg-amber-50"
+              )}
+              onClick={onToggleArchived}
             >
-              {icon}
+              <Archive className={cn("h-4 w-4", showArchived && "text-amber-800")} />
               {!isCollapsed && (
                 <>
-                  <span className="ml-2">{category}</span>
-                  {categoryCount[category] > 0 && (
+                  <span className="ml-2">{showArchived ? "Back to Active" : "Archived"}</span>
+                  {categoryCount['Archived'] > 0 && (
                     <span className="ml-auto text-xs font-medium">
-                      {categoryCount[category]}
+                      {categoryCount['Archived']}
                     </span>
                   )}
                 </>
               )}
             </Button>
-          ))}
-          <Button
-            variant={showArchived ? "secondary" : "ghost"}
-            className={cn(
-              "w-full justify-start",
-              isCollapsed && "justify-center",
-              showArchived ? "bg-amber-100 text-amber-800 hover:bg-amber-200" : 
-              "text-amber-700 hover:bg-amber-50"
-            )}
-            onClick={onToggleArchived}
-          >
-            <Archive className={cn("h-4 w-4", showArchived && "text-amber-800")} />
-            {!isCollapsed && (
-              <>
-                <span className="ml-2">{showArchived ? "Back to Active" : "Archived"}</span>
-                {categoryCount['Archived'] > 0 && (
-                  <span className="ml-auto text-xs font-medium">
-                    {categoryCount['Archived']}
-                  </span>
-                )}
-              </>
-            )}
-          </Button>
-        </div>
-      </ScrollArea>
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 }

@@ -216,7 +216,8 @@ export default function HabitsPage() {
   }
 
   return (
-    <div className="flex h-screen bg-amber-50 dot-pattern-dense">
+    <div className="flex h-full bg-amber-50 dot-pattern-dense overflow-hidden">
+      {/* Fixed position sidebar that always maintains height */}
       <Sidebar
         selectedCategory={selectedCategory}
         showArchived={showArchived}
@@ -224,9 +225,11 @@ export default function HabitsPage() {
         onToggleArchived={handleToggleArchived}
         categoryCount={categoryCount}
       />
-      <main className="flex-1 overflow-y-auto pb-6 h-screen">
-        <Container className="h-full">
-          <div className="py-6 space-y-6">
+      
+      {/* Main content area with its own scrolling */}
+      <main className="main-content">
+        <Container>
+          <div className="py-6 space-y-6 pb-16">
             {error && (
               <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg shadow-sm">
                 {error}

@@ -39,7 +39,7 @@ export default function RootLayout({
             <ParticleBackground /> 
             <DemoBanner />
             <NavBar />
-            <main className="flex-1 w-full">
+            <main className="flex-1 w-full overflow-hidden">
               {children}
             </main>
             <footer className="py-6 bg-white border-t border-amber-200">

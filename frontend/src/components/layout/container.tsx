@@ -14,7 +14,7 @@ export function Container({
 }: ContainerProps) {
   return (
     <Component
-      className={cn('container-padding mx-auto max-w-7xl', className)}
+      className={cn('container-padding mx-auto max-w-7xl h-full', className)}
       {...props}
     >
       {children}

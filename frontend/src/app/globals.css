@@ -80,6 +80,11 @@
   #__next, main {
     @apply h-screen flex-1;
   }
+  
+  /* Ensure proper handling of overflow */
+  .overflow-container {
+    @apply overflow-hidden;
+  }
 }
 
 /* Custom button styles */
@@ -109,6 +114,27 @@
 .dot-pattern-dense {
   background-image: radial-gradient(circle, rgba(245, 158, 11, 0.15) 1px, transparent 1px);
   background-size: 15px 15px;
+}
+
+/* Fixed sidebar and scrolling improvements */
+.sidebar {
+  @apply h-screen flex flex-col overflow-hidden border-r border-amber-200 bg-white;
+  position: sticky;
+  top: 0;
+  left: 0;
+  height: calc(100vh - 64px); /* Account for the header */
+  z-index: 20;
+}
+
+.sidebar-content {
+  @apply flex-1 overflow-hidden;
+}
+
+.main-content {
+  /* @apply flex-1; */
+  height: calc(100vh - 20vh); /* Adjust for header height */
+  overflow-y: auto;
+  /* overflow-x: hidden; */
 }
 
 @layer components {

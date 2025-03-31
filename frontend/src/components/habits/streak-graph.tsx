@@ -187,10 +187,10 @@ export const StreakGraph: React.FC<StreakGraphProps> = ({ data, totalActiveDays,
           <span>Less</span>
           <div className="flex gap-2">
             <div className="w-[15px] h-[15px] bg-gray-200 rounded" />
-            <div className="w-[15px] h-[15px] bg-amber-100 rounded" />
-            <div className="w-[15px] h-[15px] bg-amber-300 rounded" />
-            <div className="w-[15px] h-[15px] bg-amber-500 rounded" />
-            <div className="w-[15px] h-[15px] bg-amber-700 rounded" />
+            <div className="w-[15px] h-[15px] bg-green-100 rounded" />
+            <div className="w-[15px] h-[15px] bg-green-300 rounded" />
+            <div className="w-[15px] h-[15px] bg-green-500 rounded" />
+            <div className="w-[15px] h-[15px] bg-green-700 rounded" />
           </div>
           <span>More</span>
         </div>
