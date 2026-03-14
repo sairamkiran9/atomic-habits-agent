@@ -1,6 +1,7 @@
 "use client"
 
-import { usePathname } from 'next/navigation'
+import { useEffect } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
 
 const publicRoutes = ['/', '/login']
 
@@ -10,15 +11,19 @@ export function RouteProtection({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+  const router = useRouter()
   const isPublicRoute = publicRoutes.includes(pathname)
+  const isAuthenticated = typeof window !== 'undefined' && !!localStorage.getItem('token')
 
-  // TODO: Add actual authentication check here
-  const isAuthenticated = true // For development, always return true
+  useEffect(() => {
+    if (!isPublicRoute && !isAuthenticated) {
+      router.push('/login')
+    }
+  }, [isPublicRoute, isAuthenticated, router])
 
-  if (isPublicRoute || isAuthenticated) {
-    return <>{children}</>
+  if (!isPublicRoute && !isAuthenticated) {
+    return null
   }
 
-  // TODO: Add redirect to login or authentication flow
-  return null
+  return <>{children}</>
 }

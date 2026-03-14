@@ -22,6 +22,11 @@ from app.schemas.habit import (
 
 router = APIRouter()
 
+# Period thresholds used in streak-reset logic
+DAILY_RESET_DAYS = 1
+WEEKLY_RESET_DAYS = 7
+MONTHLY_RESET_DAYS = 31
+
 @router.post("/reset", response_model=ResetResponse)
 async def reset_habits(
     current_user: UserResponse = Depends(get_current_user),
@@ -34,7 +39,7 @@ async def reset_habits(
     """
     now = datetime.now(timezone.utc)
     reset_count = 0
-    
+
     # Get all active habits for the user
     result = await db.execute(
         select(Habit).where(
@@ -43,47 +48,59 @@ async def reset_habits(
         )
     )
     habits = result.scalars().all()
-    
+
     for habit in habits:
         should_reset = False
         last_completed = habit.last_completed or habit.created_at
-        
+
         # Convert to UTC for consistent comparison
         if last_completed.tzinfo is None:
             last_completed = last_completed.replace(tzinfo=timezone.utc)
-        
+
         # Check if habit needs to be reset based on frequency
         if habit.frequency == "daily":
             # Reset if last completion was not today
             should_reset = last_completed.date() < now.date()
-            
+
         elif habit.frequency == "weekly":
             # Reset if last completion was in a different week
             week_start = now - timedelta(days=now.weekday())
             should_reset = last_completed.date() < week_start.date()
-            
+
         elif habit.frequency == "monthly":
             # Reset if last completion was in a different month
             should_reset = (
-                last_completed.year != now.year or 
+                last_completed.year != now.year or
                 last_completed.month != now.month
             )
-        
+
         if should_reset and habit.completed:
             habit.completed = False
             reset_count += 1
-            
-            # Only reset streak if they missed the last period
-            time_diff = now - last_completed
-            if (habit.frequency == "daily" and time_diff.days > 1) or \
-               (habit.frequency == "weekly" and time_diff.days > 7) or \
-               (habit.frequency == "monthly" and time_diff.days > 31):
-                if habit.streak > 0:
+
+            # Reset streak only if they missed the previous period entirely
+            if habit.frequency == "daily":
+                yesterday = (now - timedelta(days=DAILY_RESET_DAYS)).date()
+                if last_completed.date() < yesterday:
                     habit.streak = 0
-    
+            elif habit.frequency == "weekly":
+                prev_week_start = (now - timedelta(days=now.weekday() + WEEKLY_RESET_DAYS)).date()
+                if last_completed.date() < prev_week_start:
+                    habit.streak = 0
+            elif habit.frequency == "monthly":
+                if now.month == 1:
+                    prev_month_year, prev_month = now.year - 1, 12
+                else:
+                    prev_month_year, prev_month = now.year, now.month - 1
+                if last_completed.year < prev_month_year or (
+                    last_completed.year == prev_month_year
+                    and last_completed.month < prev_month
+                ):
+                    habit.streak = 0
+
     if reset_count > 0:
         await db.commit()
-    
+
     return ResetResponse(
         reset_count=reset_count,
         message=f"Reset {reset_count} habits"
@@ -103,9 +120,6 @@ async def list_habits(
     """
     Retrieve habits for the current user with optional filtering.
     """
-    # First reset habits if needed
-    await reset_habits(current_user, db)
-    
     conditions = [Habit.user_id == current_user.id]
     
     if not include_archived:

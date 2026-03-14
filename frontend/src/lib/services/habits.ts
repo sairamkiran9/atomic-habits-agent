@@ -88,19 +88,21 @@ export class HabitsService {
     }
   }
 
-  static async checkAndResetHabits(): Promise<void> {
+  static async checkAndResetHabits(): Promise<boolean> {
     try {
       const response = await fetch(`${API_URL}/habits/reset`, {
         method: 'POST',
         headers: this.getHeaders()
       });
-      
+
       if (!response.ok) {
-        throw new Error('Failed to reset habits');
+        console.warn('Habit reset returned an error status:', response.status);
+        return false;
       }
+      return true;
     } catch (error) {
       console.error('Error resetting habits:', error);
-      // Don't throw error here, as we want to continue loading habits even if reset fails
+      return false;
     }
   }
 

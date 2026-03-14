@@ -194,13 +194,18 @@ export default function HabitsPage() {
     }
   };
 
-  // Custom handler to fix type mismatch
+  const VALID_CATEGORIES: HabitCategory[] = [
+    'Mindfulness', 'Learning', 'Productivity', 'Health',
+    'Fitness', 'Career', 'Social', 'Other',
+  ];
+
   const handleSelectCategory = (category: string | null) => {
-    // Convert string to HabitCategory if needed
     if (category === null) {
       setSelectedCategory(null);
-    } else {
+    } else if (VALID_CATEGORIES.includes(category as HabitCategory)) {
       setSelectedCategory(category as HabitCategory);
+    } else {
+      setSelectedCategory(null);
     }
   };
 
