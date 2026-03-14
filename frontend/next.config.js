@@ -1,5 +1,6 @@
 const nextConfig = {
   reactStrictMode: true,
+  transpilePackages: ['lucide-react', '@radix-ui'],
   images: {
     domains: ['localhost'],
     remotePatterns: [

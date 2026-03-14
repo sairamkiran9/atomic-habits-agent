@@ -9,6 +9,11 @@ const createIcon = (name: string) => {
 }
 
 export const Archive = createIcon('Archive')
+export const Check = createIcon('Check')
+export const ChevronDown = createIcon('ChevronDown')
+export const ChevronUp = createIcon('ChevronUp')
+export const ChevronRight = createIcon('ChevronRight')
+export const ChevronLeft = createIcon('ChevronLeft')
 export const ArchiveRestore = createIcon('ArchiveRestore')
 export const BarChart2 = createIcon('BarChart2')
 export const BookOpen = createIcon('BookOpen')
